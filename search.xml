@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search> 
+  
+  
+    
+    <entry>
+      <title>第一篇博客，测试一下各种功能</title>
+      <link href="/2020/04/20/%E7%AC%AC%E4%B8%80%E7%AF%87%E5%8D%9A%E5%AE%A2%EF%BC%8C%E6%B5%8B%E8%AF%95%E4%B8%80%E4%B8%8B%E5%90%84%E7%A7%8D%E5%8A%9F%E8%83%BD/"/>
+      <url>/2020/04/20/%E7%AC%AC%E4%B8%80%E7%AF%87%E5%8D%9A%E5%AE%A2%EF%BC%8C%E6%B5%8B%E8%AF%95%E4%B8%80%E4%B8%8B%E5%90%84%E7%A7%8D%E5%8A%9F%E8%83%BD/</url>
+      
+        <content type="html"><![CDATA[<p><strong>一、测试</strong><br>测试一下各种功能。<br>代码块</p><figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs stylus"><span class="hljs-function"><span class="hljs-title">print</span><span class="hljs-params">(<span class="hljs-string">'Hello,world!'</span>)</span></span><br></code></pre></td></tr></table></figure><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs python">print(<span class="hljs-string">'Hello,world!'</span>)<br></code></pre></td></tr></table></figure><figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c++">cout&lt;&lt;'Hello.world!'&lt;&lt;endl;<br></code></pre></td></tr></table></figure><a id="more"></a><p><strong>二、公式</strong><br>如果$a=1$，并且$x=a$<br>那么：<br>$$x=1$$</p><p><strong>三、图片</strong><br>老婆图片测试1</p><p><img src="https://img3.doubanio.com/view/photo/l/public/p2512635882.webp" alt="斋藤飞鸟1"></p><p>测试2</p><p><img src="/assets/img/test2.jpg" alt="斋藤飞鸟2"></p>]]></content>
+      
+      
+      
+        <tags>
+            
+            <tag> Meachine Learning </tag>
+            
+            <tag> Deep Learning </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+  
+  
+</search>
