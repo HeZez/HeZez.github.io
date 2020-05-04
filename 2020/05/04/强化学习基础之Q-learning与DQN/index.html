@@ -6,17 +6,28 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="https://hezez.github.io">
-  <title>Archives | 兴趣使然的博客_HeZez</title>
+  <title>强化学习基础之Q-learning与DQN | 兴趣使然的博客_HeZez</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="这可能是一个技术博客，机器学习ML，强化学习RL...">
-<meta property="og:type" content="website">
-<meta property="og:title" content="兴趣使然的博客_HeZez">
-<meta property="og:url" content="https://hezez.github.io/archives/index.html">
+  <meta name="description" content="本笔记主要用于记录本人学习过程，笔者小白一只，针对文中出现错误，欢迎交流讨论。  &amp;emsp;&amp;emsp;Q-Learning算法，是Reinforcement Learning中最经典的一个算法，也体现了model-free方法中value-base这一块的基本思想。整个方法从直观上不难理解，但要是想要深究其原理和细节，还是要下上一番功夫的。这里通过这篇笔记的方式记录一下我对Q-Learnin">
+<meta property="og:type" content="article">
+<meta property="og:title" content="强化学习基础之Q-learning与DQN">
+<meta property="og:url" content="https://hezez.github.io/2020/05/04/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80%E4%B9%8BQ-learning%E4%B8%8EDQN/index.html">
 <meta property="og:site_name" content="兴趣使然的博客_HeZez">
-<meta property="og:description" content="这可能是一个技术博客，机器学习ML，强化学习RL...">
+<meta property="og:description" content="本笔记主要用于记录本人学习过程，笔者小白一只，针对文中出现错误，欢迎交流讨论。  &amp;emsp;&amp;emsp;Q-Learning算法，是Reinforcement Learning中最经典的一个算法，也体现了model-free方法中value-base这一块的基本思想。整个方法从直观上不难理解，但要是想要深究其原理和细节，还是要下上一番功夫的。这里通过这篇笔记的方式记录一下我对Q-Learnin">
 <meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://hezez.github.io/assets/img/blog4_q_DQN/1.jpg">
+<meta property="og:image" content="https://hezez.github.io/assets/img/blog4_q_DQN/2.jpg">
+<meta property="og:image" content="https://hezez.github.io/assets/img/blog4_q_DQN/3.png">
+<meta property="og:image" content="https://hezez.github.io/assets/img/blog4_q_DQN/4.png">
+<meta property="og:image" content="https://hezez.github.io/assets/img/blog4_q_DQN/5.png">
+<meta property="og:image" content="https://hezez.github.io/assets/img/blog4_q_DQN/6.png">
+<meta property="article:published_time" content="2020-05-04T10:00:52.000Z">
+<meta property="article:modified_time" content="2020-05-04T11:26:52.754Z">
 <meta property="article:author" content="HeZez">
+<meta property="article:tag" content="强化学习">
+<meta property="article:tag" content="机器学习">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://hezez.github.io/assets/img/blog4_q_DQN/1.jpg">
   
     <link rel="alternative" href="/atom.xml" title="兴趣使然的博客_HeZez" type="application/atom+xml">
   
@@ -146,36 +157,119 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
+            <article id="post-强化学习基础之Q-learning与DQN" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
   
+    <h1 class="article-title" itemprop="name">
+      强化学习基础之Q-learning与DQN
+    </h1>
   
-    
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2020" class="archive-year">2020</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/05/04/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80%E4%B9%8BQ-learning%E4%B8%8EDQN/" class="archive-article-date">
+
+        
+        <a href="/2020/05/04/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80%E4%B9%8BQ-learning%E4%B8%8EDQN/" class="archive-article-date">
   	<time datetime="2020-05-04T10:00:52.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-05-04</time>
 </a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/05/04/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80%E4%B9%8BQ-learning%E4%B8%8EDQN/">强化学习基础之Q-learning与DQN</a>
-    </h1>
-  
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <blockquote>
+<p>本笔记主要用于记录本人学习过程，笔者小白一只，针对文中出现错误，欢迎交流讨论。</p>
+</blockquote>
+<p>&emsp;&emsp;Q-Learning算法，是Reinforcement Learning中最经典的一个算法，也体现了model-free方法中value-base这一块的基本思想。整个方法从直观上不难理解，但要是想要深究其原理和细节，还是要下上一番功夫的。这里通过这篇笔记的方式记录一下我对Q-Learning这一方法的理解和认识。主要内容来自David silver的RL课程与《Reinforcement learning an introduction》。</p>
+<a id="more"></a>
+<p>&emsp;&emsp;既然是value-base的思想，那么就要涉及到大量和value function的内容了，上一篇Actor Critic的笔记中涉及了这一部分内容，但说的不够详细，这里希望能把value function的来龙去脉说清楚。</p>
+<h3 id="一、马尔科夫决策过程-Markov-Decision-Process-MDP"><a href="#一、马尔科夫决策过程-Markov-Decision-Process-MDP" class="headerlink" title="一、马尔科夫决策过程(Markov Decision Process,MDP)"></a>一、马尔科夫决策过程(Markov Decision Process,MDP)</h3><p>&emsp;&emsp;马尔科夫决策过程(Markov Decision Process,MDP)是马尔科夫过程的一种扩展，在其中加入了决策的因素。熟悉马尔科夫过程的同学应该都知道一个重要的性质，也就是马尔科夫性：未来的状态只和当前状态有关，与历史状态无关。首先说明，在这里讨论的都是可完全观测的环境，不完全观测时为POMDP，有许多针对这一情况的研究，不过这里我只是记录一些基础知识，所以暂不考虑部分观测的问题。顺便提一句什么叫部分观测，个人理解是对环境的观测不能完全的描述当前时刻环境的状态，比如一张图片中有一间房子，但是房子后面还有一辆汽车被遮挡住了，观测时没有发现汽车，但汽车确实存在于环境中。<br>&emsp;&emsp;回到MDP本身，在尝试使用RL方法解决某一问题时，通常会选择将这一问题抽象为MDP，这是RL领域分析问题的一种方式。在一般的文献中MDP通常是一个四元组或者五元组。<br>$$MDP:&lt; S, A, R, P, \gamma &gt;$$<br>&emsp;&emsp;$S$表示当前环境的state状态集合，$A$表示action动作集合，$R$表示reward fucntion奖励函数，$P$表示状态转移概率，$\gamma$表示折现因子。<br>&emsp;&emsp;光秃秃的一个概念似乎并不是很好理解，这里结合Silver课件中的例子来说明一下，同时计算一下对应节点的累积reward或者叫value值。</p>
+<div align=center>
 
-        <div class="article-info info-on-right">
-          
+<p><img src="/assets/img/blog4_q_DQN/1.jpg" alt="MP"> </p>
+</div>
+
+<p>&emsp;&emsp;上面是一个关于学生的马尔科夫过程，注意这里没有“决策”。图中节点表示不同的状态，有上课、去酒吧、睡觉、通过考试等等，而带箭头实线上标注的小数表示沿着实线到达连接状态的概率。例如在class1的时候有50%的概率去上class2，50%的概率去刷facebook。根据这个图我们写出一个状态转移矩阵$P$，$P_{ij}$表示状态i到状态j的转移概率，其实应该还有一个初始状态分布。</p>
+<div align=center>
+
+<p><img src="/assets/img/blog4_q_DQN/2.jpg" alt="trans Matrix"> </p>
+</div>
+
+<p>&emsp;&emsp;在上面的马尔科夫过程中加入策略函数$\pi$和奖励函数$R$，其成为了马尔科夫决策过程,策略函数$\pi(a_t|s_t)$表示在状态$s_t$的条件下做出决策选择动作$a_t$，奖励函数一般是人为设计，或者通过逆强化学习等方式得到的。</p>
+<h3 id="二、Value-Function"><a href="#二、Value-Function" class="headerlink" title="二、Value Function"></a>二、Value Function</h3><p>&emsp;&emsp;一个MDP给出之后，可以算一个状态的累积reward$G_t$，公式呢就是上一篇笔记中给出的：<br>$$G_t=R_{t+1}+\gamma R_{t+2}+\gamma^2 R_{t+3}+…=\sum_{k=0}^{\infty}\gamma^k{R_{t+1+k}}$$<br>&emsp;&emsp;而state value function$V(s)$的定义是这样的，上一篇笔记中也已经给出了。<br>$$<br>V(s) = E[ \sum_{k=0}^{\infty}\gamma^k{R_{t+1+k}} | s_t=s] =<br> E[ G_t | s_t=s ]<br>$$</p>
+<p>&emsp;&emsp;给一个实际的例子看一下吧，还是上面的马尔科夫过程图片，还没有引入决策的因素，为了方便计算取$\gamma$等于1的情况。</p>
+<div align=center>
+
+<p><img src="/assets/img/blog4_q_DQN/3.png" alt="MDP"> </p>
+</div>
+
+<p>&emsp;&emsp;图中节点里标出来的值是计算出来的value值，具体怎么算的呢？说明一下，这里规定离开一个状态时获得该状态奖励，其实搞成进入时获得奖励也可以，一个意思。举个例子,class1节点的-13是怎么算出来的呢？$-2+0.5 \times-23+0.5\times-1.5=-12.75$，这里应该是为了显示数字做了近似，同理对于class3:$-2+0.6 \times 10+0.4\times0.8=4.32$。<br>&emsp;&emsp;这里的计算方法上一篇笔记中提到了<br>$$<br>V(S)=R_t +\gamma \sum_{s’\in S}P_{ss’} V_(s’)<br>$$<br>&emsp;&emsp;这个公式和上一篇笔记中的看起来不太一样是因为这个例子在算的时候没有考虑决策，而是使用的状态转移概率，一般model-free的情况下状态转移概率是未知的。<br>&emsp;&emsp;可能也会有人发现，在这个例子里，value值要从MDP的末尾向前算才行。确实，因为整个表达式是有一个DP的递推关系的，现在也有一些研究觉得在DRL方法中更新Qfunction也要遵循这样的顺序，否则带来的误差会影响训练效率。这里先不详细说了。<br>&emsp;&emsp;现在我们来引入决策的因素。让这个过程变成一个MDP。引入决策后，上面出现的概率和奖励需要做出一点改变。这些概率和奖励都受到决策动作action的影响。</p>
+<p>$$<br>\begin{aligned}<br>P_{ss’}^a = P[ s_{t+1}=s’|s_{t}=s, a_{t}=a]\\<br>R_{s}^a = E[ R_{t+1}|s_{t}=s, a_{t}=a]<br>\end{aligned}<br>$$<br>&emsp;&emsp;这个情况下的值函数怎么算呢？这时的公式和上一节的公式一样了。</p>
+<blockquote>
+<p>Actor Critic笔记中提到的：<br>$$<br>V_{\pi}(s)=\sum_{a \in A}\pi(a|s)(R_s^a +\gamma \sum_{s’\in S}P_{ss’}^a V_{\pi}(s’))<br>$$</p>
+</blockquote>
+<p>&emsp;&emsp;$\pi(a|s)$表示一个策略$\pi$在状态$s$时如何选择动作$a$，可以理解成一个概率分布。还是举个例子来算一下，帮助理解：</p>
+<div align=center>
+
+<p><img src="/assets/img/blog4_q_DQN/4.png" alt="MDP"> </p>
+</div>
+
+<p>&emsp;&emsp;这个计算的方法在图片中给出了，策略是一个随机策略，也就是在每个状态等概率的选择每个动作，可以看到这里两个动作，概率都是0.5。这里应该是认为图中那个实心点不是一个可常驻的状态，到达该实心点之后会根据图中标注的概率转移到其他状态上。从计算方法和结果来看是符合上面的公式的。<br>&emsp;&emsp;关于动态规划的递推关系，在上一篇AC的笔记中给出了一个示意图来解释，这里不重复解释了，直接给出结果：<br>$$<br>\begin{aligned}<br>V_{\pi}(s) =\sum_{a \in A}\pi(a|s)(R_s^a +\gamma \sum_{s’\in S}P_{ss’}^a V_{\pi}(s’))\\<br>Q_{\pi}(s,a) =R_s^a +\gamma \sum_{s’\in S}P_{ss’}^a \sum_{a’ \in A}\pi(a’|s’) Q_{\pi}(s’,a’)<br>\end{aligned}<br>$$</p>
+<h3 id="三、最优值函数与最优策略"><a href="#三、最优值函数与最优策略" class="headerlink" title="三、最优值函数与最优策略"></a>三、最优值函数与最优策略</h3><p>&emsp;&emsp;我们上面给出了那么多的定义和计算关系，目的就是想要得到一个最优的策略来完成制定的任务，那么在强化学习中怎样理解这个所谓的“最优策略”呢？我们认为有一个策略$\pi$，他能获得的累积reward一定大于等于其他所有的策略，形式化表示一下就是：</p>
+<blockquote>
+<p>$\pi \geq \pi’ $，当且仅当对于所有$s \in S$，$V_{\pi}(s) \geq V_{\pi’}(s) $</p>
+</blockquote>
+<p>&emsp;&emsp;直观理解起来也不难，总有策略满足上面的要求，虽然可能不止一个。关键是怎么找到他，首先定义一下这个最优价值函数：</p>
+<p>$$V_{\pi^*}(s)=\max_{\pi} V_{\pi}(s),for\quad all \quad s\in S $$</p>
+<p>&emsp;&emsp;同理：</p>
+<p>$$Q_{\pi^*}(s,a)=\max_{\pi} V_{\pi}(s,a),for\quad all \quad s\in S,a \in A$$</p>
+<p>&emsp;&emsp;这里有一个定理：</p>
+<blockquote>
+<p>定理：对于任意MDP<br>1.存在一个最优策略，比任何其他策略更好或至少相等；<br>2.所有的最优策略有相同的最优价值函数；<br>3.所有的最优策略具有相同的行为价值函数。</p>
+</blockquote>
+<p>&emsp;&emsp;定理我还没有找到形式化的证明，待找到时补上<br>&emsp;&emsp;最优值函数同时也要满足贝尔曼方程，根据这两个函数之间的递推关系，引入Max操作，把公式展开写一下：</p>
+<p>$$<br>\begin{aligned}<br>V_{\pi^{\ast}}(s) &amp;=\max_{\pi} V_{\pi}(s)\\<br>&amp;=\max_{a} Q_{\pi^{\ast}} (s,a)\\<br>&amp;=\max_{a} R_s^a +\gamma \sum_{s’\in S}P_{ss’}^a V_{\pi^{\ast}}(s’)\\<br>Q_{\pi^{\ast}}(s,a) &amp;= R_s^a +\gamma \sum_{s’\in S}P_{ss’}^a \max_{a’} Q_{\pi^{\ast}}(s’, a’)<br>\end{aligned}<br>$$</p>
+<p>&emsp;&emsp;如果可以把这个最优方程或者说最优价值函数求解出来的话，我们就可以通过他来得到最优策略。</p>
+<h3 id="四、求解最优值函数"><a href="#四、求解最优值函数" class="headerlink" title="四、求解最优值函数"></a>四、求解最优值函数</h3><p><strong>1.时序差分(Temporal-Difference,TD)方法</strong><br>&emsp;&emsp;常用的求解方法通常包括动态规划，蒙特卡洛和时序差分法。其中动态规划需要知道状态转移概率，蒙特卡洛和时序差分常用于model-free中，这篇笔记为了引出q-learning，所以着重说一下时序差分。<br>&emsp;&emsp;时序差分(Temporal-Difference,TD)方法是一种基于bootstrapping的方法。对于Model-free的情况，我们需要想办法解决不知道MDP的真实状态转移概率等信息的问题，蒙特卡洛法通过大量采样，频率代替概率的方法解决，TD方法则通过一点点的用真实数据修正的方法。具体这个bootstrapping是啥意思，我们先看看TD方法具体是怎么做的。<br>&emsp;&emsp;我们知道$V(s) =E[ G_t | s_t=s ]$，这里的$G_t$期望值，如果我选择通过仿真得到多条轨迹，收集奖励reward并计算平均值的方式得到，那就是蒙特卡洛方法。但是如果采用这样的方式：</p>
+<p>$$E[ G_t | s_t=s ]\approx R_{t+1}+\gamma V(s_{t+1}) $$</p>
+<p>&emsp;&emsp;采用这样一个近似，意义在于：现有的价值函数$V$并不准确，我们认为与环境交互得到的奖励$R_{t+1}$是准确的，那么就通过上述方式得到一个$G_t$期望的估计，相对于原始的$V(s)$来说，这个近似值更准确一些。这里就可以给出TD error的概念。</p>
+<p>$$TD \quad error:[R_{t+1}+\gamma V(s_{t+1})]-V(s_t) $$</p>
+<p>&emsp;&emsp;如果通过不断迭代，更新原始的价值函数$V$来减小TD error，价值函数就会越来越准确。这个做法我个人认为就是所谓的bootstrapping。这也是Q-learning算法和核心思想。<br><strong>2.Q-learning算法</strong><br>&emsp;&emsp;在model-free的情况下，对于MDP的状态转移概率等信息我们一概不知，那么采用什么样的方法给出控制呢？q-learning算法认为我们的最优策略应该是这样的：</p>
+<p>$$\pi^{\ast}(s)= argmax_{a\in A}Q (s,a)$$</p>
+<p>&emsp;&emsp;也就是贪婪的思想，我们总想要执行回报更高的动作。但是如果完全采用贪婪的策略可能会有问题，由于环境中存在一定的随机性，比如一个经典的电视节目，打开一扇关闭的门后可能会有山羊，也可能是汽车，这一次打开看到了山羊，也许下一次就会出现汽车，如果我们完全贪婪，那我们再也不会打开这扇门，也就失去了得到汽车的机会。这也就涉及到了强化学习的一个关键的环节，<strong>探索(exploration)</strong>。探索可以帮助agent发现潜在可能的更高reward动作，进而提升最终的表现。Q-learning算法中采用一种叫$\epsilon-greedy$的方式进行探索，直观一点说就是在做决策的时候，大概率贪婪的选择动作，小概率随机选择动作以进行探索。形式化一下就是:</p>
+<p>$$<br>\pi(a|s) = \left \{ \begin{aligned}<br>&amp;a=argmax_{a \in A}Q(s,a) &amp;\quad 1-\epsilon\\<br>&amp;a=random \quad\epsilon<br>\end{aligned} \right.<br>$$</p>
+<p>&emsp;&emsp;一般$\epsilon$选择一个小的数，比如0.1、0.2等等。我们通常会看到文献中说Q-learning是一个off-policy的方法，他还有一个叫SARSA算法的on-policy孪生兄弟，这里两个算法的区别在哪里，on/off-policy又是什么意思？首先这里给出Q-learning算法的流程，之后解释一下这几个点。</p>
+<div align=center>
+
+<p><img src="/assets/img/blog4_q_DQN/5.png" alt="Q-learning"> </p>
+</div>
+
+<p>&emsp;&emsp;首先说一下，最基本Q-learning算法只能求解表格型的Q function，也就是Q函数是一个表格，其中的一个位置填入的是(s,a)对的Q值。从上面的流程可以看到agent与环境交互的过程，在选择action的时候遵循$\epsilon-greedy$，在计算TD error的时候，选择$Q(s’,a’)$遵从纯粹的贪婪策略。这是Q-learning算法最明显的off-policy特征，<strong>直观的理解就是，off-policy获取数据的策略和更新的策略不是同一个，</strong> 除了q-learning以外另一个常见的例子就是off-policy的AC算法，其在更新agent策略的时候，使用可能是一段时间之前获取的数据，获取数据时的策略和现在时刻更新了很多轮的策略已经不是同一个了。<br>&emsp;&emsp;off-policy的算法中数据由于并不是当前策略得到的，所以会有一定的误差，比如说许久之前的一个奖励$R_s^a$，由于当前的策略变了，再来一次的话奖励可能变成 $R_s^{a\prime}$了。为了解决这个问题一般采用重要性采样，也就是引入一个重要性权重来修正这种误差，这里对于重要性采样先不详细介绍了。<br>&emsp;&emsp;但是问题又来了，Q-learning算法是off-policy的，但是从上面的算法流程中没有看到重要性采样和所谓的重要性权重在里面，这是为什么呢？<br>&emsp;&emsp;我们把计算TD error那一步单独拿出来看一下：</p>
+<p>$$<br>R_t+\gamma \max_{a_{t+1}} Q(s_{t+1},a_{t+1})-Q(s_t,a_t)<br>$$</p>
+<p>&emsp;&emsp;这里没有使用重要性采样的原因在于，这个更新是1-step的，要更新的(s,a)是确定的，不管用什么策略和环境交互得到了这个(s,a)对，其对应的reward都是一样的，所以直接拿来用没有任何影响。如果这里变成2-step的话，TD error大概这么算：<br>$$<br>[R_t+\gamma R_{t+1} + \gamma^2 \max_{a_{t+2}} Q(s_{t+2},a_{t+2})]-Q(s_t,a_t)<br>$$<br>&emsp;&emsp;这里$R_{t+1}$前面就不应该光秃秃的，应该引入重要性权重，因为这个$R_{t+1}$是$\epsilon-greedy$与环境交互得到的，其具体到达哪个(s,a)和采用纯贪婪时会有区别，所以需要重要性权重。<br>&emsp;&emsp;<strong>问题$\times2$，Q-learning一定能收敛到最优值函数吗？</strong><br>&emsp;&emsp;结论是，在离散情况下，也就是表格型的Q function存在收敛保证。证明起来比较复杂，最近比较忙这里先挖个坑，待填。</p>
+<h3 id="四、DQN"><a href="#四、DQN" class="headerlink" title="四、DQN"></a>四、DQN</h3><p>&emsp;&emsp;上一节说到Q-learning算法只能解决离散情况下的问题，这样局限性太大，毕竟不是所有的问题都是离散的，有时做离散化也不是很方便。DQN就是一种用神经网络来近似表格型Q function的算法，除了用到了深度学习中的神经网络之外，DQN和传统Q-learning算法的区别有两点：<br>1.<strong>采用了replay-buffer</strong><br>&emsp;&emsp;就是把agent和环境交互的过程存储成(s,a,r,s’)的形式，在更新神经网络的时候，从存储的数据中随机抽出一部分数据组成一个batch，这样做的目的是为了打消时序数据之间的相关性，如果是连续数据的话会对对结果有影响，熟悉机器学习的同学应该都记得ML中要求数据是独立同分布的吧。<br>2.<strong>引入了target网络和eval网络</strong><br>&emsp;&emsp;其实可以只用一个神经网络去拟合Q函数，但是一个问题是如果只有一个神经网络，在网络权重更新之后可能会和之前的网络有较大的差异，这样在训练的时候会不太稳定。为了使稳定性更高，引入了一个target网络，target网络与eval网络都是拟合Q函数的，初始化时两个网络权重一致，区别在于eval网络的权重通过误差反向传播更新，而target网络权重不变，每隔一段时间将target网络的权重更新到与eval网络权重一致，为了稳定也可以采用momentum的思想。</p>
+<div align=center>
+
+<p><img src="/assets/img/blog4_q_DQN/6.png" alt="DQN"> </p>
+</div>
+
+<p>&emsp;&emsp;算法流程就是上图这样了，loss是由TD error构建的MSE。<br>&emsp;&emsp;我这里用pytorch写了一个DQN的代码，因为pytorch好写一些….这里我实在ipython中写的，所以一些文件依赖没有写进去，如果想要运行的小伙伴需要注意。python版本3.6，pytorch版本1.5.0+cu101。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> copy<br><span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np<br><span class="hljs-keyword">import</span> torch<br><span class="hljs-keyword">import</span> torch.nn <span class="hljs-keyword">as</span> nn<br><span class="hljs-keyword">import</span> torch.nn.functional <span class="hljs-keyword">as</span> F<br><br><br><span class="hljs-comment"># 定义一个q网络</span><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">q_network</span><span class="hljs-params">(nn.Module)</span>:</span><br>  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span><span class="hljs-params">(self, state_dim, action_dim)</span>:</span><br>    super(q_network, self).__init__()<br>    self.n1 = nn.Linear(state_dim, <span class="hljs-number">256</span>)<br>    self.n2 = nn.Linear(<span class="hljs-number">256</span>, <span class="hljs-number">128</span>)<br>    self.n3 = nn.Linear(<span class="hljs-number">128</span>, action_dim)<br><br>    self.state_dim = state_dim<br>    self.action_dim = action_dim<br>  <br>  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">forward</span><span class="hljs-params">(self, state)</span>:</span><br>    h = F.relu(self.n1(state))<br>    h = F.relu(self.n2(h))<br>    q_s_a = self.n3(h)<br>    <span class="hljs-keyword">return</span> q_s_a<br><br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">DQN</span><span class="hljs-params">(object)</span>:</span><br>  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span><span class="hljs-params">(self, state_dim, action_num, device, discount=<span class="hljs-number">0.99</span>, tau=<span class="hljs-number">0.005</span>)</span>:</span><br>    self.discount = discount<br>    self.tau = tau<br>    self.device = device<br>    self.state_dim = state_dim<br>    self.action_num = action_num<br><br>    self.q_net = q_network(state_dim, action_num).to(device)<br>    self.q_net_target = copy.deepcopy(self.q_net)<br>    self.q_net_optimizer = torch.optim.Adam(self.q_net.parameters())<br><br>  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">choose_action</span><span class="hljs-params">(self, state)</span>:</span><br>    state = torch.FloatTensor(state.reshape(<span class="hljs-number">1</span>, <span class="hljs-number">-1</span>)).to(self.device)<br>    q_s_a = self.q_net(state)<br>    action = torch.argmax(q_s_a)<br>    action = action.cpu().numpy()<br><br>    <span class="hljs-keyword">return</span> action<br><br>  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">train</span><span class="hljs-params">(self, replay_buffer, b_size)</span>:</span><br>    <span class="hljs-comment"># Sample replay buffer </span><br>    state, action, next_state, reward, not_done = replay_buffer.sample(batch_size=b_size)<br><br>    <span class="hljs-comment"># Compute the target Q value</span><br><br>    target_q_s_a = self.q_net_target(next_state)<br>    <span class="hljs-comment"># print(target_q_s_a)</span><br>    target_q = torch.max(target_q_s_a, dim=<span class="hljs-number">1</span>)<br>    <span class="hljs-comment"># target_q现在是(len(target_q),)的，准换一下变成[len(target_q),1]</span><br>    <span class="hljs-comment"># 这里我不知道有没有更简洁的写法</span><br>    <span class="hljs-comment"># print(target_q[0].cpu().detach().numpy())</span><br>    target_q = target_q[<span class="hljs-number">0</span>].cpu().detach().numpy()<br>    target_q = target_q.reshape((len(target_q), <span class="hljs-number">1</span>))<br>    target_q = torch.from_numpy(target_q).to(self.device)<br>    target_q = reward + (not_done * self.discount * target_q).detach()<br><br>    <span class="hljs-comment"># Get current Q estimate</span><br>    current_q = self.q_net(state)<br>    action = action.long()<br>    current_q = torch.gather(current_q, dim=<span class="hljs-number">1</span>, index=action)<br><br>    <span class="hljs-comment"># Compute loss</span><br>    q_loss = F.mse_loss(current_q, target_q)<br><br>    <span class="hljs-comment"># Optimize the q_net</span><br>    self.q_net_optimizer.zero_grad()<br>    q_loss.backward()<br>    self.q_net_optimizer.step()<br><br>    <span class="hljs-comment"># 更新 target net</span><br>    <span class="hljs-keyword">for</span> param, target_param <span class="hljs-keyword">in</span> zip(self.q_net.parameters(), self.q_net_target.parameters()):<br>      target_param.data.copy_(self.tau * param.data + (<span class="hljs-number">1</span> - self.tau) * target_param.data)<br><br>  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">save</span><span class="hljs-params">(self, filename)</span>:</span><br>    torch.save(self.q_net.state_dict(), filename + <span class="hljs-string">"_dqn"</span>)<br>    torch.save(self.q_net_optimizer.state_dict(), filename + <span class="hljs-string">"_dqn_optimizer"</span>)<br><br>  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">load</span><span class="hljs-params">(self, filename)</span>:</span><br>    self.q_net.load_state_dict(torch.load(filename + <span class="hljs-string">"_dqn"</span>))<br>    self.q_net_optimizer.load_state_dict(torch.load(filename + <span class="hljs-string">"_dqn_optimizer"</span>))<br>    self.q_net_target = copy.deepcopy(self.q_net)<br></code></pre></td></tr></table></figure>
+<p>&emsp;&emsp;接下来是replay buffer和一些训练参数。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np<br><span class="hljs-keyword">import</span> torch<br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">replay_buffer</span><span class="hljs-params">(object)</span>:</span><br>  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span><span class="hljs-params">(self, state_dim, action_dim, device, max_size=int<span class="hljs-params">(<span class="hljs-number">1e5</span>)</span>)</span>:</span><br>    self.max_size = max_size<br>    self.pointer = <span class="hljs-number">0</span><br>    self.size = <span class="hljs-number">0</span><br><br>    self.state = np.zeros((max_size, state_dim))<br>    self.action = np.zeros((max_size, action_dim))<br>    self.next_state = np.zeros((max_size, state_dim))<br>    self.reward = np.zeros((max_size, <span class="hljs-number">1</span>))<br>    self.not_done = np.zeros((max_size, <span class="hljs-number">1</span>))<br><br>    self.device = device<br><br>  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">store</span><span class="hljs-params">(self, s, a, n_s, r, done)</span>:</span><br>    self.state[self.pointer] = s<br>    self.action[self.pointer] = a<br>    self.next_state[self.pointer] = n_s<br>    self.reward[self.pointer] = r<br>    self.not_done[self.pointer] = <span class="hljs-number">1.</span> - done<br><br>    self.pointer = (self.pointer + <span class="hljs-number">1</span>) % self.max_size<br>    self.size = min(self.size + <span class="hljs-number">1</span>, self.max_size) <br><br>  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">sample</span><span class="hljs-params">(self, batch_size)</span>:</span><br>    index = np.random.randint(<span class="hljs-number">0</span>, self.size, size=batch_size)<br><br>    <span class="hljs-keyword">return</span> (<br>      torch.FloatTensor(self.state[index]).to(self.device),<br>      torch.FloatTensor(self.action[index]).to(self.device),<br>      torch.FloatTensor(self.next_state[index]).to(self.device),<br>      torch.FloatTensor(self.reward[index]).to(self.device),<br>      torch.FloatTensor(self.not_done[index]).to(self.device)<br>    )<br>  <br>  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">save</span><span class="hljs-params">(self, save_folder)</span>:</span><br>    np.save(<span class="hljs-string">f"<span class="hljs-subst">&#123;save_folder&#125;</span>_state.npy"</span>, self.state[:self.size])<br>    np.save(<span class="hljs-string">f"<span class="hljs-subst">&#123;save_folder&#125;</span>_action.npy"</span>, self.action[:self.size])<br>    np.save(<span class="hljs-string">f"<span class="hljs-subst">&#123;save_folder&#125;</span>_next_state.npy"</span>, self.next_state[:self.size])<br>    np.save(<span class="hljs-string">f"<span class="hljs-subst">&#123;save_folder&#125;</span>_reward.npy"</span>, self.reward[:self.size])<br>    np.save(<span class="hljs-string">f"<span class="hljs-subst">&#123;save_folder&#125;</span>_not_done.npy"</span>, self.not_done[:self.size])<br>    np.save(<span class="hljs-string">f"<span class="hljs-subst">&#123;save_folder&#125;</span>_ptr.npy"</span>, self.pointer)<br><br>  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">load</span><span class="hljs-params">(self, save_folder, size=<span class="hljs-number">-1</span>)</span>:</span><br>    reward_buffer = np.load(<span class="hljs-string">f"<span class="hljs-subst">&#123;save_folder&#125;</span>_reward.npy"</span>)<br><br>    <span class="hljs-comment"># Adjust crt_size if we're using a custom size</span><br>    size = min(int(size), self.max_size) <span class="hljs-keyword">if</span> size &gt; <span class="hljs-number">0</span> <span class="hljs-keyword">else</span> self.max_size<br>    self.size = min(reward_buffer.shape[<span class="hljs-number">0</span>], size)<br><br>    self.state[:self.size] = np.load(<span class="hljs-string">f"<span class="hljs-subst">&#123;save_folder&#125;</span>_state.npy"</span>)[:self.size]<br>    self.action[:self.size] = np.load(<span class="hljs-string">f"<span class="hljs-subst">&#123;save_folder&#125;</span>_action.npy"</span>)[:self.size]<br>    self.next_state[:self.size] = np.load(<span class="hljs-string">f"<span class="hljs-subst">&#123;save_folder&#125;</span>_next_state.npy"</span>)[:self.size]<br>    self.reward[:self.size] = reward_buffer[:self.size]<br>    self.not_done[:self.size] = np.load(<span class="hljs-string">f"<span class="hljs-subst">&#123;save_folder&#125;</span>_not_done.npy"</span>)[:self.size]<br><br><br><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Argument</span><span class="hljs-params">()</span>:</span><br>  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span><span class="hljs-params">(self, env, seed, buffer_name, eval_freq, max_timesteps, start_timesteps, rand_action_p, gaussian_std, batch_size, </span></span><br><span class="hljs-function"><span class="hljs-params">               discount, tau, lmbda, phi, train_behavioral, generate_buffer)</span>:</span><br>    self.env = env<br>    self.seed = seed<br>    self.buffer_name = buffer_name<br>    self.eval_freq = eval_freq<br>    self.max_timesteps = max_timesteps<br>    self.start_timesteps = start_timesteps<br>    self.rand_action_p = rand_action_p<br>    self.gaussian_std = gaussian_std<br>    self.batch_size = batch_size<br>    self.discount = discount<br>    self.tau = tau<br>    self.lmbda = lmbda<br>    self.phi = phi<br>    self.train_behavioral = train_behavioral<br>    self.generate_buffer = generate_buffer<br></code></pre></td></tr></table></figure>
+<p>&emsp;&emsp;最后是训练的主体部分。环境选择了一个openAI gym中的一个简单环境，小车上的倒立摆，小车两个选择，向左或者向右移动，目的是尽可能的保证立在车上的杆保持直立。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> gym<br><span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np<br><span class="hljs-keyword">import</span> os<br><span class="hljs-keyword">import</span> torch<br><br><br><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">train_DQN</span><span class="hljs-params">(env, state_dim, action_dim, action_num, device, args)</span>:</span><br>  setting = <span class="hljs-string">f"<span class="hljs-subst">&#123;args.env&#125;</span>_<span class="hljs-subst">&#123;args.seed&#125;</span>"</span><br>  buffer_name = <span class="hljs-string">f"<span class="hljs-subst">&#123;args.buffer_name&#125;</span>_<span class="hljs-subst">&#123;setting&#125;</span>"</span><br><br>	<span class="hljs-comment"># Initialize and load policy</span><br>  policy = DQN(state_dim, action_num, device)<span class="hljs-comment">#, args.discount, args.tau)</span><br><br>  r_buffer = replay_buffer(state_dim, action_dim, device)<br><br>  evaluations = []<br><br>  state = env.reset()<br>  episode_reward = <span class="hljs-number">0</span><br>  episode_total_steps = <span class="hljs-number">0</span><br>  episode_num = <span class="hljs-number">0</span><br><br>  <span class="hljs-keyword">for</span> t <span class="hljs-keyword">in</span> range(args.max_timesteps):<br>    episode_total_steps += <span class="hljs-number">1</span><br>    <span class="hljs-comment"># 选择action</span><br>    <span class="hljs-keyword">if</span> (<br>      (args.generate_buffer <span class="hljs-keyword">and</span> np.random.uniform(<span class="hljs-number">0</span>, <span class="hljs-number">1</span>) &lt; args.rand_action_p) <span class="hljs-keyword">or</span> <br>      (args.train_behavioral <span class="hljs-keyword">and</span> t &lt; args.start_timesteps)<br>      ):<br>      action = env.action_space.sample()<br>    <span class="hljs-keyword">else</span>:<br>      action = policy.choose_action(np.array(state))<br>      <span class="hljs-comment"># print(action)</span><br>    next_state, reward, done, _ = env.step(action)<br>    done_bool = float(done) <span class="hljs-keyword">if</span> episode_total_steps &lt; env._max_episode_steps <span class="hljs-keyword">else</span> <span class="hljs-number">0</span><br><br>    r_buffer.store(state, action, next_state, reward, done_bool)<br>    state = next_state<br>    episode_reward += reward<br>    <span class="hljs-keyword">if</span> args.train_behavioral <span class="hljs-keyword">and</span> t &gt;= args.start_timesteps:<br>      policy.train(r_buffer, args.batch_size)<br><br>    <span class="hljs-keyword">if</span> done: <br>      <span class="hljs-comment"># +1 to account for 0 indexing. +0 on ep_timesteps since it will increment +1 even if done=True</span><br>      print(<span class="hljs-string">f"Total T: <span class="hljs-subst">&#123;t+<span class="hljs-number">1</span>&#125;</span> Episode Num: <span class="hljs-subst">&#123;episode_num+<span class="hljs-number">1</span>&#125;</span> Episode T: <span class="hljs-subst">&#123;episode_total_steps&#125;</span> Reward: <span class="hljs-subst">&#123;episode_reward:<span class="hljs-number">.3</span>f&#125;</span>"</span>)<br>      <span class="hljs-comment"># Reset environment</span><br>      state, done = env.reset(), <span class="hljs-literal">False</span><br>      episode_reward = <span class="hljs-number">0</span><br>      episode_total_steps = <span class="hljs-number">0</span><br>      episode_num += <span class="hljs-number">1</span><br>  <span class="hljs-comment"># Save final policy</span><br>  <span class="hljs-keyword">if</span> args.train_behavioral:<br>    policy.save(<span class="hljs-string">f"./drive/My Drive/my_VAE_RL/models/DQN/behavioral_<span class="hljs-subst">&#123;setting&#125;</span>_dqn"</span>)<br>  <span class="hljs-keyword">else</span>:<br>    r_buffer.save(<span class="hljs-string">f"./drive/My Drive/my_VAE_RL/buffers/DQN/<span class="hljs-subst">&#123;buffer_name&#125;</span>_dqn"</span>)<br><br><br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">"__main__"</span>:<br>  env = <span class="hljs-string">"CartPole-v0"</span><br>  seed = <span class="hljs-number">0</span><br>  buffer_name = <span class="hljs-string">"Robust"</span><br>  eval_freq = float(<span class="hljs-number">5e3</span>)<br>  max_timesteps = int(<span class="hljs-number">5e4</span>)<br>  start_timesteps = int(<span class="hljs-number">3e3</span>)<br>  rand_action_p = <span class="hljs-number">0.2</span><br>  gaussian_std = <span class="hljs-number">0.3</span><br>  batch_size = <span class="hljs-number">256</span><br>  discount = <span class="hljs-number">0.99</span><br>  tau = <span class="hljs-number">0.005</span><br>  lmbda = <span class="hljs-number">0.75</span><br>  phi = <span class="hljs-number">0.05</span><br>  train_behavioral = <span class="hljs-literal">True</span><br>  generate_buffer = <span class="hljs-literal">False</span><br>  args = Argument(env, seed, buffer_name, eval_freq, max_timesteps, start_timesteps, rand_action_p,<br>                  gaussian_std, batch_size, discount, tau, lmbda, phi, train_behavioral, generate_buffer)<br>  print(<span class="hljs-string">"---------------------------------------"</span>)<br><br>  <span class="hljs-keyword">if</span> args.train_behavioral:<br>    print(<span class="hljs-string">f"Setting: Training behavioral, Env: <span class="hljs-subst">&#123;args.env&#125;</span>, Seed: <span class="hljs-subst">&#123;args.seed&#125;</span>"</span>)<br>  <span class="hljs-keyword">elif</span> args.generate_buffer:<br>    print(<span class="hljs-string">f"Setting: Generating buffer, Env: <span class="hljs-subst">&#123;args.env&#125;</span>, Seed: <span class="hljs-subst">&#123;args.seed&#125;</span>"</span>)<br>  <span class="hljs-keyword">else</span>:<br>    print(<span class="hljs-string">f"Setting: Training myVAE, Env: <span class="hljs-subst">&#123;args.env&#125;</span>, Seed: <span class="hljs-subst">&#123;args.seed&#125;</span>"</span>)<br><br>  print(<span class="hljs-string">"---------------------------------------"</span>)<br><br>  <span class="hljs-keyword">if</span> args.train_behavioral <span class="hljs-keyword">and</span> args.generate_buffer:<br>    print(<span class="hljs-string">"Train_behavioral and generate_buffer cannot both be true."</span>)<br>    exit()<br><br>  <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> os.path.exists(<span class="hljs-string">"./drive/My Drive/my_VAE_RL/results/DQN"</span>):<br>    os.makedirs(<span class="hljs-string">"./drive/My Drive/my_VAE_RL/results/DQN"</span>)<br><br>  <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> os.path.exists(<span class="hljs-string">"./drive/My Drive/my_VAE_RL/models/DQN"</span>):<br>    os.makedirs(<span class="hljs-string">"./drive/My Drive/my_VAE_RL/models/DQN"</span>)<br><br>  <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> os.path.exists(<span class="hljs-string">"./drive/My Drive/my_VAE_RL/buffers/DQN"</span>):<br>    os.makedirs(<span class="hljs-string">"./drive/My Drive/my_VAE_RL/buffers/DQN"</span>)<br><br>  env = gym.make(args.env)<br><br>  env.seed(args.seed)<br>  torch.manual_seed(args.seed)<br>  np.random.seed(args.seed)<br><br>  state_dim = env.observation_space.shape[<span class="hljs-number">0</span>]<br>  action_dim = <span class="hljs-number">1</span><br>  action_num = <span class="hljs-number">2</span><br><br>  device = torch.device(<span class="hljs-string">"cuda"</span> <span class="hljs-keyword">if</span> torch.cuda.is_available() <span class="hljs-keyword">else</span> <span class="hljs-string">"cpu"</span>)<br><br>  train_DQN(env, state_dim, action_dim, action_num, device, args)<br></code></pre></td></tr></table></figure>
+<p>&emsp;&emsp;由于时间仓促，实现的比较简单，也不知道有没有bug，而且由于实验环境限制，我也没有考虑基于视觉的任务，注释也不多，以后有时间补上。由于在colab上，代码中的文件路径有些奇怪，不要在意。</p>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a href="https://www.bilibili.com/video/BV18b411e733" target="_blank" rel="noopener">UCB CS294</a><br><a href="https://www.bilibili.com/video/BV1Tx411D723" target="_blank" rel="noopener">David Silver的强化学习课程</a><br>Reinforcement learning an introduction：Richard S. Sutton and Andrew G. Barto</p>
+<p>这篇笔记还有很多细节没有完善，最近在忙毕业论文，等有时间了回来补上。</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
@@ -191,179 +285,55 @@
 		</ul>
 	</div>
 
-          
+      
 
-        </div>
-        <div class="clearfix"></div>
-    </header>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/04/26/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80%E4%B9%8BActor-Critic%E5%88%9D%E6%8E%A2/" class="archive-article-date">
-  	<time datetime="2020-04-26T03:21:21.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-04-26</time>
-</a>
+<nav id="article-nav">
+  
+  
+    <a href="/2020/04/26/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80%E4%B9%8BActor-Critic%E5%88%9D%E6%8E%A2/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">强化学习基础之Actor Critic初探</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
         </div>
-    	 
+        
+        
+    </div>
+</aside>
+
+
+
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/04/26/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80%E4%B9%8BActor-Critic%E5%88%9D%E6%8E%A2/">强化学习基础之Actor Critic初探</a>
-    </h1>
+  
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">强化学习</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">机器学习</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/04/22/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%E4%B9%8B%E7%AD%96%E7%95%A5%E6%A2%AF%E5%BA%A6Policy-Gradient/" class="archive-article-date">
-  	<time datetime="2020-04-22T12:57:56.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-04-22</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/04/22/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%E4%B9%8B%E7%AD%96%E7%95%A5%E6%A2%AF%E5%BA%A6Policy-Gradient/">强化学习之策略梯度Policy Gradient</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">强化学习</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">机器学习</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/04/20/%E8%AE%B0%E5%BD%95%E4%B8%80%E4%B8%8Bhexo%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA%E5%92%8C%E6%8D%A2yilia%E4%B8%BB%E9%A2%98%E8%BF%87%E7%A8%8B%E4%B8%AD%E5%87%BA%E7%8E%B0%E7%9A%84%E9%97%AE%E9%A2%98/" class="archive-article-date">
-  	<time datetime="2020-04-20T06:47:18.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-04-20</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/04/20/%E8%AE%B0%E5%BD%95%E4%B8%80%E4%B8%8Bhexo%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA%E5%92%8C%E6%8D%A2yilia%E4%B8%BB%E9%A2%98%E8%BF%87%E7%A8%8B%E4%B8%AD%E5%87%BA%E7%8E%B0%E7%9A%84%E9%97%AE%E9%A2%98/">记录一下hexo博客搭建和换yilia主题过程中出现的问题</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">博客搭建</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2020/04/20/%E7%AC%AC%E4%B8%80%E7%AF%87%E5%8D%9A%E5%AE%A2%EF%BC%8C%E6%B5%8B%E8%AF%95%E4%B8%80%E4%B8%8B%E5%90%84%E7%A7%8D%E5%8A%9F%E8%83%BD/" class="archive-article-date">
-  	<time datetime="2020-04-20T01:53:45.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2020-04-20</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2020/04/20/%E7%AC%AC%E4%B8%80%E7%AF%87%E5%8D%9A%E5%AE%A2%EF%BC%8C%E6%B5%8B%E8%AF%95%E4%B8%80%E4%B8%8B%E5%90%84%E7%A7%8D%E5%8A%9F%E8%83%BD/">第一篇博客，测试一下各种功能</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">机器学习</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-  
-    </div></section>
-  
-
-    
 
 
           </div>
@@ -388,8 +358,8 @@
 	var yiliaConfig = {
 		mathjax: true,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: false,
