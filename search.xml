@@ -4,6 +4,27 @@
   
     
     <entry>
+      <title>pandas常用内容</title>
+      <link href="/2020/08/09/pandas%E5%B8%B8%E7%94%A8%E5%86%85%E5%AE%B9/"/>
+      <url>/2020/08/09/pandas%E5%B8%B8%E7%94%A8%E5%86%85%E5%AE%B9/</url>
+      
+        <content type="html"><![CDATA[<blockquote><p>当年不努力，老大现学贼难受(就不押韵)<br>本笔记的主要内容来自于<a href="https://www.zhihu.com/question/56310477/answer/873227129" target="_blank" rel="noopener">吹牛顿的知乎的回答</a>，这里主要是总结并自己练习一下，学习建议看原回答。</p></blockquote><a id="more"></a><h2 id="一-基础内容"><a href="#一-基础内容" class="headerlink" title="一 基础内容"></a>一 基础内容</h2><p>pandas中的数据格式主要有两种，dataframe和series，简单一点理解的话可以把DataFrame理解成excel的那种二维数据表<br>Series可以看成是其中的一列，列这个概念在pandas中非常重要</p><ol><li><p>数据的创建 读取 查看等：pd.DataFrame(数据)，数据的格式可以是字典的列表，也可以是。。。<br> 数据的行索引叫做index,列叫做columns<br> 读数据时可以pd.read_csv(‘path’)或者pd.read_excel(‘path’)<br> 查看数据时可以用df.head()或者df.tail()来指定查看开头或者末尾的数据，具体的条数可以作为参数传进去</p></li><li><p>查看data的格式，df.info()可以查看dataframe的各种信息，包括行列数，每个column的数据类型，有多少条非空数据等等</p></li><li><p>统计信息浏览：df.describe()，可以给出每个column的统计信息，包括均值，标准差，中位数等等，只有数值型的列才会被统计</p></li><li><p>column的基本操作：这里的操作可以类比于SQL的增删改查操作<br> <em>增加一列</em>：df[‘新列名’] = 新数据<br> <em>删除一列</em>：使用drop函数，df.drop(‘删除列名’， axis=1, inplace=True)，这里axis与一般的相同，0是行，1是列，inplace代表是否在原数据上进行操作<br> <em>查找一列</em>：df[‘查找的列名’]即可，如果想要选择多列的话，df[[ list ]]即可，list为想要选择的列。<br> 修改可以有很多的花样，这里先不多说。</p></li><li><p>常用数据类型及操作：<br> <em>字符串</em>：pandas的字符串操作与python原生字符串操作基本一致，只是都是需要df.str.xxx ()形式，加上.str来调用相关方法。这里有个例子<br> df[‘数据清洗’] = df[‘数据清洗’].str.replace(‘-‘, ‘’) 这样就可以将该列中的-全部去掉，一般要用清洗后的列替换原始数据<br> <em>数值型</em>：单列数据的加减某一固定数字只需选出某列直接+即可，列与列之间也可以乘除，前提是两列数据量相同，注意数值才可以运算，字符串不可以，比较值得注意的是%的数据pandas中认为是字符串，需要把%去掉再除以100以进行数值运算。<br> <em>时间类型</em>：pandas中有一个指定的时间数据类型 datatime64，一般情况下会将日期读成字符串，但是可以将符合要求的数据转换为datatime64，例子 df[‘日期’] = pd.to_datetime(df[‘日期’])，时间数据类型可以很方便的操作，如相加减等等。<strong>注意这里对日期的介绍很有限，不管是数据库还是pandas，时间这里感觉都有很多讲究，可以深入了解一下</strong></p></li><li><p>数据重置索引Index:<br> 可以手动指定index参数，也可以调用df.reset_index()函数，不过原始索引会变成数据列保存下来，可以指定<br> df.reset_index(drop=True) 这样原始的索引列就会被丢弃</p></li></ol><h2 id="二-pandas的索引"><a href="#二-pandas的索引" class="headerlink" title="二 pandas的索引"></a>二 pandas的索引</h2><ol><li><p>基于位置的索引：可以选取指定某些行和列。形式：df.iloc[行索引，列索引]，这里的行索引和列索引可以是指定整数，也可以是数字list，也可以是切片</p></li><li><p>基于名称的索引：几个应用场景<br> (1)选择某一列中值为X的行：例如一组数据共20行，df[‘A’] == ‘X’ 会返回20个bool值，对应着每一行的’A’列是不是等于’X’，根据这个返回结果，可以用loc函数选择对应满足要求的数据行  df.loc[df[‘A’] == ‘X’, :]<br> (2)根据列名选择列：df.loc[:, [‘A’, ‘B’]]<br> (3)判断一列数据中等于某一值可以用==操作，要是想要对比挑出来的值有多个怎么办，pandas中提供了isin函数用于对比，参数可以是一个列表。例子：df.loc[df[‘A’].isin([‘X’, ‘Y’]), :]，如果想要排除，可以使用~df[‘A’].isin([…])<br> (4)pandas中列向求统计值的方法，有很成熟的function df[‘A’].mean()/.std()/.median()/.max()/.min()<br> (5)pandas还支持很骚的条件筛选，看个例子：</p><pre><code>df[&apos;A&apos;] &gt; df[&apos;A&apos;].mean() 会返回所有行是否满足要求的bool结果，同上，根据这个结果和loc()可以得到对应数据，同时这样的判断还支持很多条一起用，可以用&amp; 和 | 组成判断表达式</code></pre></li></ol><h2 id="三-数据清洗的常用操作"><a href="#三-数据清洗的常用操作" class="headerlink" title="三 数据清洗的常用操作"></a>三 数据清洗的常用操作</h2><p>还是按照增删改查的分类进行介绍<br>excel数据有可能被分在多个sheet中，可以在read_excel()中指定参数sheetname=’A’来读取指定sheet数据</p><ol><li><p>增 拓展数据维度：<br> (1)纵向的数据拼接：相对于几个表如果其对应列完全相同，可以理解为“摞在一起”。形式为pd.concat([表1, 表2, 表3])</p><p> (2)横向的数据拼接：这里不用例子不太好说明，给个教程的例子吧<br> h1 = pd.DataFrame({‘语文’:[12,23,23,34,45], ‘数学’:[34,54,12,67,56], ‘英语’:[45,67,98,76,56]}, index=[‘张三’,’李四’,’王五’,’二狗’,’铁蛋’])</p><p> h2 = pd.DataFrame({‘舞蹈’：[32,45,67,45], ‘体育’:[78,98,80,70]}, index=[‘张三’,’白展堂’,’燕小六’,’佟湘玉’])<br> h1表给出了五位同学的三科成绩，h2表给出了四位同学的两科成绩<br> 将两个表连接起来：<br> pd.merge(left=h1, right=h2, left_index=True, right_index=True, how=inner)</p><p> 参数left和right表示左右的两个表，left_index等表示是否用index作为匹配内容，<br> 这个how可选 inner left right outer,这里用index作为匹配内容，<br> 那么inner的话就是要左右表中都出现的index代表的行才会出现在merge结果中<br> left的话就是保留左表所有内容，右表中有和左表index相同的行合并进来，right同理<br> outer就是两表的数据都保留，合并到一起</p></li><li><p>删 删空去重<br> (1)删除空值：df.dropna(),带有空值的行都会被删除     如果只想在某列中挑选有空值的行进行删除：df.dropna(subset=[‘A’, ‘B’])</p><p> (2)去重：df.drop_duplicates(),  同理，想限制在列范围内df.drop_duplicates(subset=[‘A’, ‘B’])</p></li><li><p>查询<br> (1)loc()可以结合各种判断条件查询数据</p><p> (2)排序：df.sort_values(‘A’, ascending=False) ,根据某一列排序，ascending为True时是升序，False是降序</p><p> <em>注意，不管是去重、删空还是排序，默认的inplace都是False，操作后原数据都不会变，需要用新变量记录结果，或者inplace=True</em></p></li><li><p>分组和切分<br> (1)分组：分组函数groupby，其最重要的参数时column的名字，例如df.groupby([‘A’, ‘B’]) ，按照列A分组，之后按照列B分组。注意groupby的分组结果不是一个dataframe，一般需要配合.sum() .mean() 等等方法一起使用得到组内的统计结果。或者其返回的结果其实是一组结果，其中一个结果是一个group的名字跟着一个同组数据的dataframe，<br> 可以通过 for group_name, data in group: 循环取出结果</p><p> (2)切分cut：切分通常用于拆分一维数据，并打标。其方法和参数为  pd.cut(x, bins, right, labels)<br> 第一个参数x是传入的一维数据，可以是一行也可以是一列<br> 第二个参数bins是切分的方式，形式可以是列表[a, b, c] 意思是把数据分成a到b,b到c的范围两部分，也可以是一个整数，例如5，意思是把数据均分为5份。<br> 第三个参数right的含义是区间右侧是否封闭，True的时候区间左闭又闭，False的时候区间左闭右开<br> 第四个参数labels，打标签的内容，数量要和分组数量相同</p></li></ol><h2 id="pandas的apply函数"><a href="#pandas的apply函数" class="headerlink" title="pandas的apply函数"></a>pandas的apply函数</h2><p>按照我看的这个教程，apply函数多数和groupby函数一起用，但其实可以有其他的使用情况，感觉apply函数还是非常灵活的。<br>例子待补充</p>]]></content>
+      
+      
+      
+        <tags>
+            
+            <tag> pandas </tag>
+            
+            <tag> 数据操作 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>强化学习基础之Q-learning与DQN</title>
       <link href="/2020/05/04/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80%E4%B9%8BQ-learning%E4%B8%8EDQN/"/>
       <url>/2020/05/04/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80%E4%B9%8BQ-learning%E4%B8%8EDQN/</url>
