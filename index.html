@@ -165,170 +165,9 @@
     <div class="article-entry" itemprop="articleBody">
       
         <p>flash-attention是一种基于现有GPU架构的attention计算优化方法，其运算结果和正常self-attention完全等价，并且有更高的计算效率，基本是现在全部decoder-only LLM的训练必备技巧。这里记录对其原理内容进行记录。主要参考其他博文和原文，参杂部分个人理解。</p>
-<p>参考：</p>
-<blockquote>
-<ol>
-<li>原论文FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness：<a target="_blank" rel="noopener" href="https://arxiv.org/pdf/2205.14135">https://arxiv.org/pdf/2205.14135</a></li>
-<li>博文1：<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/639228219">https://zhuanlan.zhihu.com/p/639228219</a></li>
-<li>博文2：<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/624740065">https://zhuanlan.zhihu.com/p/624740065</a></li>
-</ol>
-</blockquote>
-<h2 id="transformer层的计算量和性能瓶颈"><a href="#transformer层的计算量和性能瓶颈" class="headerlink" title="transformer层的计算量和性能瓶颈"></a>transformer层的计算量和性能瓶颈</h2><p>对于一般transformer decoder only架构，假设输入shape为(b, l, e), 隐藏维度为h, 一共有a个head，每个head维度为 $h&#x2F;a&#x3D;d$，则单个transformer block的运算量和显存占用可按如下方式计算，可分为self-attention和MLP两部分独立计算。</p>
-<h3 id="显存占用量"><a href="#显存占用量" class="headerlink" title="显存占用量"></a>显存占用量</h3><ol>
-<li><p>模型权重、梯度、优化器权重显存占用量(单个transformer block, adam优化器)</p>
-<table>
-<thead>
-<tr>
-<th align="center">layer</th>
-<th align="center">模型权重参数量</th>
-<th align="center">梯度参数量</th>
-<th align="center">优化器参数量</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="center">self-att, QKV映射矩阵，O矩阵映射合并多个head结果</td>
-<td align="center">(h,h)大小矩阵,4个共$4h^2(+4h, 如果模型有bias)$</td>
-<td align="center">梯度与模型权重大小一致$4h^2(+4h, 如果模型有bias)$</td>
-<td align="center">每个参数有一个动量和方差，$4h^2(+4h, 如果模型有bias)$再*2</td>
-</tr>
-<tr>
-<td align="center">self-att, layer_norm</td>
-<td align="center">缩放参数和偏移量$2h$</td>
-<td align="center">$2h$</td>
-<td align="center">$2h$再*2</td>
-</tr>
-<tr>
-<td align="center">MLP, 两个线性层</td>
-<td align="center">第一层先升维到(h,4h)-&gt;$4h^2$，第二层降回来(4h,h)-&gt;$4h^2$, 总计$8h^2(+5h, 如果模型有bias)$</td>
-<td align="center">$8h^2(+5h, 如果模型有bias)$</td>
-<td align="center">$8h^2(+5h, 如果模型有bias)$再乘2</td>
-</tr>
-<tr>
-<td align="center">MLP, layer_norm</td>
-<td align="center">缩放参数和偏移量$2h$</td>
-<td align="center">$2h$</td>
-<td align="center">$2h$再乘2</td>
-</tr>
-</tbody></table>
-</li>
-<li><p>中间结果显存占用量，包括梯度，优化器变量，中间激活值(本部分计算不引入混合精度，重计算和并行计算)</p>
-<table>
-<thead>
-<tr>
-<th align="center">layer</th>
-<th align="center">中间激活值</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="center">self-att, QKV映射矩阵</td>
-<td align="center">QKV结果(b,l,h)大小矩阵，参数量为3blh；同时为后续计算，每个映射结果需按head数分组(b,a,l,d), 但这部分只改变内存的组织形式，没有实际计算，可直接转换回去，一般不需要额外的激活值存储空间</td>
-</tr>
-<tr>
-<td align="center">self-att, QK的att计算</td>
-<td align="center">(b,a,l,l), $bal^2$</td>
-</tr>
-<tr>
-<td align="center">self-att, att结果的归一化</td>
-<td align="center">(b,a,l,l), 参数量$bal^2$，这一步进行了计算按理应该存，但其实是除了一个常数，应该可以合并</td>
-</tr>
-<tr>
-<td align="center">self-att, att结果的mask</td>
-<td align="center">(b,a,l,l), mask本质应该只是不计算某些位置的梯度，应该不用单独存储？</td>
-</tr>
-<tr>
-<td align="center">self-att, 对att结果softmax</td>
-<td align="center">(b,a,l,l), 参数量$bal^2$</td>
-</tr>
-<tr>
-<td align="center">self-att, socre和V计算加权V</td>
-<td align="center">(b,a,l,d), 参数量$blh$</td>
-</tr>
-<tr>
-<td align="center">self-att, 加权V合并多头</td>
-<td align="center">(b,l,h), 也是通过改变形状得到的，不需要额外存储</td>
-</tr>
-<tr>
-<td align="center">self-att, 加权V投影输出</td>
-<td align="center">(b,l,h), 参数量$blh$</td>
-</tr>
-<tr>
-<td align="center">MLP, 两个线性层</td>
-<td align="center">bl4h+blh</td>
-</tr>
-<tr>
-<td align="center">MLP, layer_norm</td>
-<td align="center">blh</td>
-</tr>
-</tbody></table>
-</li>
-</ol>
-<h3 id="实际计算中的效率瓶颈"><a href="#实际计算中的效率瓶颈" class="headerlink" title="实际计算中的效率瓶颈"></a>实际计算中的效率瓶颈</h3><p>首先考虑现阶段一般GPU的存储架构</p>
-<p>a. 不同显存等级和读写速度：</p>
-<p>i. HBM(high bandwidth memory)，常规认知下的显存，一般比较大，消费级显卡10+G, ai计算卡几十G。但读写速度慢一些：1.5TB&#x2F;s</p>
-<p>ii. SRAM(Static random access memory), 可能类似于CPU的cache，一般比较小.以A100 40G为例，显卡芯片每个流处理器有192K，108个流处理器一共20M左右，但其读写速度很快，约19TB&#x2F;s</p>
-<p>iii. 一般的GPU操作是从显存读数据到SRAM，之后计算完成再存回HBM。如果一个操作的HBM访问特别频繁，那么内存访问时间更长遇到IO瓶颈，GPU其实在空闲等待计算。</p>
-<p>b. 计算受限与内存受限（该部分直接引用博文内容）</p>
-<blockquote>
-<p>和常规的定义类似，如果计算单元在等IO，那么计算受限，反之就是内存受限。由于计算单元计算和IO读写可以同步进行，所以一般最终的耗时是<br>$$\begin{equation}<br>\begin{split}<br>&amp;T_{final}&#x3D;\max\ (T_{mem}, T_{math})\<br>&amp;T_{mem}&#x3D;\frac{N_{byte}}{BW_{mem}}, 数据读取总量除以显存读写速度 \<br>&amp;T_{math}&#x3D;\frac{N_{op}}{BW_{math}}, 计算总量除以计算带宽?(还是浮点计算速度呢?) \<br>\end{split}<br>\end{equation}$$<br>如果$T_{math}&gt;T_{mem}$，那么根据不等式关系可得$\frac{N_{op}}{N_{byte}} &gt; \frac{BW_{math}}{BW_{mem}}$，反之亦然。给$\frac{N_{op}}{N_{byte}}$起个名字叫算数强度。如果算数强度大于计算速度比IO速度，就是计算受限，反之是内存受限。<br>矩阵乘法的计算量，对于两个N行D列的矩阵，假设二者相乘得到一个N*N的矩阵，那么某个位置由一行和一列计算得到，每个位置需要计算D次乘法和D次加法，那么完整的计算次数为$2DN^2$<br>假设计算一次self att中的Q与K相乘的操作，Q和K都是$R^{N\times d}$，计算$QK^T$得到一个$R^{N\times N}$的矩阵其计算量为$N_{op}&#x3D;2N^2d$，内存读写量为(假设为fp16)$N_{byte}&#x3D;2Nd+2Nd+2N^2$(QK 2个，一个相乘att结果)。通过计算该算数强度，结合显卡的实际参数得到的计算与存储带宽之比，在结合实际QK运算中不同的维度，可以计算得到一个操作是计算受限的还是内存受限的。<br>现阶段的实际硬件参数基本都是内存受限。</p>
-</blockquote>
-<h2 id="理解flash-attention的一些背景"><a href="#理解flash-attention的一些背景" class="headerlink" title="理解flash-attention的一些背景"></a>理解flash-attention的一些背景</h2><h3 id="kernel融合"><a href="#kernel融合" class="headerlink" title="kernel融合"></a>kernel融合</h3><p>为了避免频繁的HBM访问，可以考虑对计算算子进行融合，把几个计算步骤都算完了再存回HBM。由于模型训练时需要计算梯度，所以中间结果也得写回HBM。所以避免这部分访存开销的操作是融合+中间结果的重计算。但某些中间结果是不得不存的。</p>
-<h3 id="safe-softmax"><a href="#safe-softmax" class="headerlink" title="safe softmax"></a>safe softmax</h3><p>对于向量$[x_0, x_1, … , x_n]$，其softmax的计算为</p>
-<p>$$softmax(x_i)&#x3D;\frac{e^{x_i}}{\sum_{j&#x3D;1}^{n} e^{x_j} }$$</p>
-<p>因为softmax函数计算包含$e^x$这个指数值，对于fp32和bf16, x &gt; 89左右计算结果就会inf, 所以一般计算的时候x都会减去max(x)。</p>
-<h2 id="flash-attention的具体计算流程"><a href="#flash-attention的具体计算流程" class="headerlink" title="flash-attention的具体计算流程"></a>flash-attention的具体计算流程</h2><h3 id="前向传播"><a href="#前向传播" class="headerlink" title="前向传播"></a>前向传播</h3><p>主要基于tiliing分块计算，可以做kernel融合，减少和HBM交互。同时SRAM不够大，没办法把整个att矩阵扔进去，于是分块算</p>
-<p>原始的单一head attention计算，步骤拆解一下可以分为：<br>        $$ S &#x3D; att_m &#x3D; QK^T, shape N<em>N $$<br>        $$ P &#x3D; softmax(att_m), shape N</em>N $$<br>        $$ O &#x3D; PV, shape N*d $$</p>
-<p>S和P这两个中间结果都要写回HBM，内存复杂度O(N*N)，IO开销很大。只是Q K V O是O(Nd)的显存级别，现在的LLM N一般比d大很多。不光显存占的多，而且频繁访问HBM效率低。</p>
-<p>首先从最基础情况开始，对于一个row tensor，假设$x\in R^{1\times B}$，其计算softmax的流程可抽象为：<br>    $$\begin{equation}<br>    \begin{split}<br>    &amp;m(x):&#x3D;\max\limits_{i} (x_i)\<br>    &amp;f(x):&#x3D;[e^{x_1-m(x)}…e^{x_B-m(x)}] \<br>    &amp;l(x):&#x3D;\sum\limits_{i}f(x)_i \<br>    &amp;softmax(x):&#x3D;\frac{f(x)}{l(x)} \<br>    \end{split}<br>    \end{equation}$$</p>
-<p>如果把行向量分块计算softmax，$x^{(1)},x^{(2)}\in R^{B}, x&#x3D;[x^{(1)},x^{(2)}]\in R^{2B}$</p>
-<p>  $$\begin{equation}<br>    \begin{split}<br>    &amp;m(x)&#x3D;m([x^{(1)},x^{(2)}])&#x3D;max(m(x^{(1)}),m(x^{(2)}))\<br>    &amp;f(x)&#x3D;[e^{m(x^{(1)})-m(x)}f(x^{(1)}) \quad e^{m(x^{(2)})-m(x)}f(x^{(2)})]\<br>    &amp;l(x)&#x3D;e^{m(x^{(1)})-m(x)}l(x^{(1)})+e^{m(x^{(2)})-m(x)}l(x^{(2)})\<br>    &amp;softmax(x):&#x3D;\frac{f(x)}{l(x)}<br>    \end{split}<br>    \end{equation}$$</p>
-<p>和正常计算相比，由于safe-softmax的存在，每个block的$max(x^{(i)})$并不是全局max，所以需要维护row维度的全局m(x)和加和l(x)，在最大值更新后进而更新之前的加和计算结果(也就是乘$e^{m(x^{(1)})-m(x)}$这一部分)。</p>
-<p>扩展到整个attention矩阵和self-attention最终结果的计算，一般会将QKV结果先进行分块，后按逻辑进行计算。整体是双重循环，一些实现是Q分块为外层循环，KV是内层，一些实现则相反。这里按原文的KV为外层循环的逻辑进行理解。</p>
-<p>论文原文的伪代码流程</p>
-<ol>
-<li>假设我们的Q K V都是$R^{N*d}$的矩阵(既N为序列长度,d为隐藏层维度),SRAM的大小为M。划分时分块大小为$B_c&#x3D;\lceil\frac{M}{4d}\rceil,B_r&#x3D;min(\lceil\frac{M}{4d}\rceil,d)$</li>
-<li>在HBM中初始化几个需要保存的变量：$O&#x3D;(0)_{N\times d}\in R^{N\times d},l&#x3D;(0)_N\in R^N,m&#x3D;(0)_N\in R^N$</li>
-<li>对原始的Q K V进行分块，把Q按照$B_r$分成$T_r&#x3D;\lceil\frac{N}{B_r}\rceil$块$Q_1,…,Q_{T_r}$，其shape为$B_r\times d$。把K和V按照$B_c$分成$T_c&#x3D;\lceil\frac{N}{B_c}\rceil$块$K_1,…K_{T_c}$和$V_1,…V_{T_c}$，其shape为$B_c\times d$</li>
-<li>把HBM中需要保存的内容也做拆分，O拆分成$T_r$份$O_1,…,O_{T_r}, O_i\in R^{B_r\times d}$，l和m都拆分为$T_r$份$l_1,…,l_{T_r}, m_1,…,m_{T_r}\quad l_i,m_i \in R^{B_r}$</li>
-<li>以$T_c$作为外层循环，从HBM中load分块后的第j块K_j和V_j</li>
-<li>$\qquad$ $T_r$作为内层循环，从HBM中加载第i块$Q_i$,$O_i$, $m_i$,$l_i$</li>
-<li>$\qquad\qquad$在SRAM上计算$S_{ij}&#x3D;Q_iK_{j}^T\in R^{B_r\times B_c}$</li>
-<li>$\qquad\qquad$在SRAM上计算$\widetilde{m}<em>{ij}&#x3D;rowmax(S</em>{ij})\in R^{B_r},\widetilde{P}<em>{ij}&#x3D;exp(S</em>{ij}-\widetilde{m}<em>{ij})\in R^{B_r\times B_c}, \widetilde{l</em>{ij}}&#x3D;rowsum(\widetilde{P}_{ij})\in R^{B_r}$</li>
-<li>$\qquad\qquad$在SRAM上计算$m_i^{new}&#x3D;max(m_i, \widetilde{m}<em>{ij})\in R^{B_r},l_i^{new}&#x3D;e^{m_i-m_i^{new}}l_i+e^{\widetilde{m}</em>{ij}-m_i^{new}}\widetilde{l_{ij}}\in R^{B_r}$。</li>
-<li>$\qquad\qquad$在SRAM上计算新的$O_i&#x3D;diag(l_i^{new})^{-1}(diag(l_i)e^{m_i-m_i^{new}}O_i+e^{\widetilde{m}<em>{ij}-m_i^{new}}\widetilde{P}</em>{ij}V_j)$，再把结果写回到HBM中。</li>
-<li>$\qquad\qquad$ 把 $m_i&#x3D;m_i^{new},l_i&#x3D;l_i^{new}$ 写回到HBM中</li>
-</ol>
-<p>解释下里面具体的细节：</p>
-<p>第一步中的B_c和B_r是根据硬件显存大小和具体的矩阵shape决定的，可以看下论文原文中的叙述。</p>
-<p>完成一次外层循环，相当于一部分的K和完整的Q做了attention，并和一部分V做了加权。如果明确其计算的attention矩阵部分，应是一个大小为[N, B_c]的块，很明显一次外循环计算了所有行，但由于列不全，m和l需要记录和更新。</p>
-<p>在第9步中，$m$的更新容易理解。l的更新涉及到两部分，更新已有l内部的max，并累加当前循环新得到应加入的行累加项，也就是+算式的前后两部分。</p>
-<p>在第10步中使用了对角阵计算，左对角阵乘右矩阵按实际的计算方式，相当于为右矩阵的每一行乘上左矩阵对角线对应行的元素。所以$diag(l_i^{new})^{-1}$乘进去是作为新的softmax分母的。$e^{m_i-m_i^{new}}O_i$是在更新m的最新值，$diag(l_i)$乘进去是在消去老的softmax分母。$e^{\widetilde{m}<em>{ij}-m_i^{new}}\widetilde{P}</em>{ij}V_j$是在累加当前循环的结果。一次完整外循环会得到一个完成N*d的O结果，整个循环完成O会覆盖更新多次。</p>
-<p>具体哪里做了kernel融合？哪些环节需要重计算呢？</p>
-<p>整个流程中是没有显式计算S和P矩阵的，每个读进来的Q K分块，计算完当前的attention部分后，都直接和V运算并进行变换得到最终的O，中间结果都融合了没写出到HBM。但S和P矩阵在反向传播的时候需要使用，所以其需要进行重计算，但如果真的重计算这两个N*N的矩阵，那HBM访问量又被拉回来了。所以实际在反向传播时仍然避免了实例化这两个矩阵。</p>
-<h3 id="反向传播"><a href="#反向传播" class="headerlink" title="反向传播"></a>反向传播</h3><p>先回顾一下softmax的求导</p>
-<p>假设有输入X, 经过softmax计算后输入为Y，二者维度都为k</p>
-<p>$$softmax(x_i)&#x3D; \frac{e^{x_i}}{\sum_{k}e^{x_k}}&#x3D;y_i$$</p>
-<p>那么$\frac{\partial y_i}{\partial x_i}$求导</p>
-<p>$$<br>\begin{equation}<br>\begin{split}<br>    \frac{\partial y_i}{\partial x_i}&amp;&#x3D;\frac{e^{x_i}}{\sum_{k}e^{x_k}} - (\frac{e^{x_i}e^{x_i}}{(\sum_{k}e^{x_k})^2})\<br>    &amp;&#x3D;\frac{ e^{x_i}\sum_{k}e^{x_k} - e^{x_i}e^{x_i} }{ (\sum_{k}e^{x_k})^2 }\<br>    &amp;&#x3D;\frac{e^{x_i}}{\sum_{k}e^{x_k}} - \frac{\sum_{k}e^{x_k} - e^{x^i}}{\sum_{k}e^{x_k}}\<br>    &amp;&#x3D;y_i(1-y_i)&#x3D;y_i-y_i*y_i<br>\end{split}<br>\end{equation}<br>$$</p>
-<p>对于$\frac{\partial y_i}{\partial x_j}, i\neq j$</p>
-<p>$$<br>\begin{equation}<br>\begin{split}<br>    \frac{\partial y_i}{\partial x_j}&amp;&#x3D;0 - (\frac{e^{x_i} e^{x_j}}{(\sum_{k}e^{x_k})^2})\<br>    &amp;&#x3D;-y_i * y_j<br>\end{split}<br>\end{equation}<br>$$</p>
-<p>进而如果对矩阵的行维度做sofmax操作，针对一行的输出Y，针对所有输入X，求导结果为一个k*k的矩阵，softmax结果矩阵的雅可比矩阵形式应为：</p>
-<p>$$<br>\frac{\partial Y}{\partial X} &#x3D; diag(Y) - YY^T<br>$$</p>
-<p>self attention部分，需要求梯度更新的部分包括$W_{Q&#x2F;K&#x2F;V&#x2F;O}$，还需要针对输入X求梯度以便继续向上一层反向传播。</p>
-<p>正常的求导步骤，根据前向传播的流程(不考虑mask, group等情况 dropout等情况)</p>
-<p>$$ S &#x3D; att_m &#x3D; QK^T, shape N<em>N $$<br>$$ P &#x3D; softmax(S), shape N</em>N $$<br>$$ O &#x3D; PV, shape N*d $$</p>
-<p>由于在前向传播时为了提高访存效率，没有记录中间结果S和P。只记录了att分数矩阵行维度的max m和sum l。 在求梯度的时候需要根据l和m算Q K的权重梯度，同时要避免直接还原整个att分数矩阵。</p>
-<p>核心单向传播思路参考原始论文</p>
-<p>首先假设loss函数为L，那么$\mathcal{d} O&#x3D;\frac{\partial L}{\partial O}$，进而$\mathcal{d} V&#x3D;\frac{\partial L}{\partial O} \frac{\partial O}{\partial V}$</p>
-<p>根据$ O &#x3D; PV, shape N*d $可得，</p>
-<p>$$<br>\begin{equation}<br>\begin{split}<br>\mathcal{d} V_j&amp;&#x3D;\frac{\partial L}{\partial O} \frac{\partial O}{\partial V} \<br>&amp;&#x3D;\sum_{i}P_{ij}dOi&#x3D;\sum_{i}\frac{q_ik^T_j}{l_i}dOi<br>\end{split}<br>\end{equation}<br>$$</p>
-<p>dq和dk需要计算S和P的梯度</p>
-<p>对于$dP$，$\mathcal{d} P&#x3D;\frac{\partial L}{\partial O} \frac{\partial O}{\partial P}&#x3D;\mathcal{d} O V$</p>
-<p>再进一步由于$P &#x3D; softmax(S), shape N*N$，这是一个逐行的矩阵softmax操作，那么$\mathcal{d} S&#x3D;\frac{\partial L}{\partial O} \frac{\partial O}{\partial P} \frac{\partial P}{\partial S}$</p>
-<p>根据上面推导的行softmax雅可比矩阵形式</p>
-<p>$$<br>\begin{equation}<br>\begin{split}<br>\mathcal{d} S_i &amp;&#x3D; (\mathcal{diag}(P_{i:}) - P_{i:}P_{i:}^T) \mathcal{d} P_{i:} \<br>&amp; &#x3D; P_{i:}\mathcal{d} P_{i:} - (P_{i:}^T\mathcal{d} P_{i:})P_{i:} \<br>&amp;&#x3D;P_{i:}\mathcal{d} P_{i:} - (\mathcal{d} O_{i}^T \sum_{i}\frac{q_ik^T_j}{l_i} V_j)P_{i:} \<br>&amp;&#x3D;P_{i:}\mathcal{d} P_{i:} - (\mathcal{d} O_{i}^T O_i)P_{i:} \<br>\end{split}<br>\end{equation}<br>$$</p>
-<p>此时梯度中的$\mathcal{d} P_{i:},\mathcal{d} O_{i}$等中间信息都是可以用缓存的l和qk重计算累加得到的。对于Q和K的权重梯度</p>
-<p>具体公式可见论文原文或引用博客，其中的一些运算维度和矩阵运算的细节理解并不清晰，目前仅作记录。</p>
-
+        
+          <a class="article-more-a" href="/2025/06/24/flashattention_%E5%8E%9F%E7%90%86%E9%80%9F%E8%AE%B0/#more">more >></a>
+        
       
 
       
@@ -1240,14 +1079,6 @@ MathJax.Hub.Queue(function() {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">深度学习</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">强化学习</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">pandas</a>
               </li>
              
@@ -1256,11 +1087,19 @@ MathJax.Hub.Queue(function() {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">博客搭建</a>
+                <a href="javascript:void(0)" class="js-tag color5">深度学习</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">强化学习</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">模型推理实践</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">博客搭建</a>
               </li>
             
             <div class="clearfix"></div>

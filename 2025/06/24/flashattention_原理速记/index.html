@@ -8,15 +8,15 @@
   <link rel="dns-prefetch" href="https://hezez.github.io">
   <title>鹦鹉学舌-flash-attention 原理速记 | 兴趣使然的博客_HeZez</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="flash-attention是一种基于现有GPU架构的attention计算优化方法，其运算结果和正常self-attention完全等价，并且有更高的计算效率，基本是现在全部decoder-only LLM的训练必备技巧。这里记录对其原理内容进行记录。主要参考其他博文和原文，参杂部分个人理解。 参考：   原论文FlashAttention: Fast and Memory-Efficient">
+  <meta name="description" content="flash-attention是一种基于现有GPU架构的attention计算优化方法，其运算结果和正常self-attention完全等价，并且有更高的计算效率，基本是现在全部decoder-only LLM的训练必备技巧。这里记录对其原理内容进行记录。主要参考其他博文和原文，参杂部分个人理解。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="鹦鹉学舌-flash-attention 原理速记">
 <meta property="og:url" content="https://hezez.github.io/2025/06/24/flashattention_%E5%8E%9F%E7%90%86%E9%80%9F%E8%AE%B0/index.html">
 <meta property="og:site_name" content="兴趣使然的博客_HeZez">
-<meta property="og:description" content="flash-attention是一种基于现有GPU架构的attention计算优化方法，其运算结果和正常self-attention完全等价，并且有更高的计算效率，基本是现在全部decoder-only LLM的训练必备技巧。这里记录对其原理内容进行记录。主要参考其他博文和原文，参杂部分个人理解。 参考：   原论文FlashAttention: Fast and Memory-Efficient">
+<meta property="og:description" content="flash-attention是一种基于现有GPU架构的attention计算优化方法，其运算结果和正常self-attention完全等价，并且有更高的计算效率，基本是现在全部decoder-only LLM的训练必备技巧。这里记录对其原理内容进行记录。主要参考其他博文和原文，参杂部分个人理解。">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2025-06-24T13:08:45.000Z">
-<meta property="article:modified_time" content="2025-06-24T13:13:17.587Z">
+<meta property="article:modified_time" content="2025-06-24T13:19:00.741Z">
 <meta property="article:author" content="HeZez">
 <meta property="article:tag" content="深度学习">
 <meta name="twitter:card" content="summary">
@@ -166,6 +166,8 @@
     <div class="article-entry" itemprop="articleBody">
       
         <p>flash-attention是一种基于现有GPU架构的attention计算优化方法，其运算结果和正常self-attention完全等价，并且有更高的计算效率，基本是现在全部decoder-only LLM的训练必备技巧。这里记录对其原理内容进行记录。主要参考其他博文和原文，参杂部分个人理解。</p>
+<span id="more"></span>
+
 <p>参考：</p>
 <blockquote>
 <ol>
@@ -518,14 +520,6 @@ MathJax.Hub.Queue(function() {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">深度学习</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">强化学习</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">pandas</a>
               </li>
              
@@ -534,11 +528,19 @@ MathJax.Hub.Queue(function() {
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">博客搭建</a>
+                <a href="javascript:void(0)" class="js-tag color5">深度学习</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">强化学习</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">模型推理实践</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">博客搭建</a>
               </li>
             
             <div class="clearfix"></div>
