@@ -6,16 +6,20 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="https://hezez.github.io">
-  <title>Archives: 2025 | 兴趣使然的博客_HeZez</title>
+  <title>鹦鹉学舌-MHA的一些常见变种 | 兴趣使然的博客_HeZez</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="这可能是一个技术博客，机器学习ML，强化学习RL...">
-<meta property="og:type" content="website">
-<meta property="og:title" content="兴趣使然的博客_HeZez">
-<meta property="og:url" content="https://hezez.github.io/archives/2025/index.html">
+  <meta name="description" content="记录一些MHA的变种，原理网上都搜得到，仅作个人记录 相关的图片后续补充">
+<meta property="og:type" content="article">
+<meta property="og:title" content="鹦鹉学舌-MHA的一些常见变种">
+<meta property="og:url" content="https://hezez.github.io/2025/06/29/%E5%87%A0%E7%A7%8DMHA%E7%9A%84%E4%BC%98%E5%8C%96%E6%96%B9%E6%A1%88%E6%95%B4%E7%90%86/index.html">
 <meta property="og:site_name" content="兴趣使然的博客_HeZez">
-<meta property="og:description" content="这可能是一个技术博客，机器学习ML，强化学习RL...">
+<meta property="og:description" content="记录一些MHA的变种，原理网上都搜得到，仅作个人记录 相关的图片后续补充">
 <meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2025-06-29T04:06:45.000Z">
+<meta property="article:modified_time" content="2025-06-29T04:37:58.434Z">
 <meta property="article:author" content="HeZez">
+<meta property="article:tag" content="深度学习">
+<meta property="article:tag" content="transormfer">
 <meta name="twitter:card" content="summary">
   
     <link rel="alternative" href="/atom.xml" title="兴趣使然的博客_HeZez" type="application/atom+xml">
@@ -142,36 +146,96 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-几种MHA的优化方案整理" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
     
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2025" class="archive-year">2025</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2025/06/29/%E5%87%A0%E7%A7%8DMHA%E7%9A%84%E4%BC%98%E5%8C%96%E6%96%B9%E6%A1%88%E6%95%B4%E7%90%86/" class="archive-article-date">
-  	<time datetime="2025-06-29T04:06:45.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2025-06-29</time>
-</a>
-        </div>
-    	 
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2025/06/29/%E5%87%A0%E7%A7%8DMHA%E7%9A%84%E4%BC%98%E5%8C%96%E6%96%B9%E6%A1%88%E6%95%B4%E7%90%86/">鹦鹉学舌-MHA的一些常见变种</a>
+    <h1 class="article-title" itemprop="name">
+      鹦鹉学舌-MHA的一些常见变种
     </h1>
   
 
-        <div class="article-info info-on-right">
-          
+        
+        <a href="/2025/06/29/%E5%87%A0%E7%A7%8DMHA%E7%9A%84%E4%BC%98%E5%8C%96%E6%96%B9%E6%A1%88%E6%95%B4%E7%90%86/" class="archive-article-date">
+  	<time datetime="2025-06-29T04:06:45.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2025-06-29</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>记录一些MHA的变种，原理网上都搜得到，仅作个人记录</p>
+<p>相关的图片后续补充</p>
+<span id="more"></span>
+<h2 id="标准的self-attention"><a href="#标准的self-attention" class="headerlink" title="标准的self-attention"></a>标准的self-attention</h2><p>原理这里不再赘述，在互联网所有有大量介绍的帖子。</p>
+<p>这里记录一个细节，为什么一版QK^T之后要除以根号dk</p>
+<p>一般的self attention实现会在矩阵相乘后除以$\sqrt{d_k}$，dk是 q k 向量的维度（一些矩阵初始化方法改变初始分布可以不除这个值）。原因是原始数据满足(0, 1)分布，在相乘之后期望为0，但方差变成了dk，经过softmax之后结果分布会很陡峭，熵很低信息变少了。所以除以dk还原回(0, 1)分布。假设Q和K的向量分别为$Q_i,K_j$，每个向量的维度为dk，具体的推导为：</p>
+<script type="math/tex; mode=display">
+\begin{equation}
+\begin{aligned}
+E[Q_iK_j] &= E[\sum_{k=1}^{d_k}Q_{ik}K_{jk}]\\
+ &= \sum_{k=1}^{d_k}E[Q_{ik}]E[K_{jk}] = 0\\
+\end{aligned}
+\end{equation}</script><p>所以在点积后结果期望仍然为0</p>
+<script type="math/tex; mode=display">
+\begin{equation}
+\begin{aligned}
+VAR[Q_iK_j] &= E[(Q_iK_j)^2] - (E[Q_iK_j])^2\\
+ &= E[(\sum_{k=1}^{d_k}Q_{ik}K_{jk})^2] - 0\\
+ &= \sum_{k=1}^{d_k}E[Q_{ik}^2]E[K_{jk}^2]  \quad上面的平方式乘开会有交叉项，但是交叉项都是0期望进一步乘积，结果仍为0，这里省略 \\
+ &=d_k \quad这里E[Q_{ik}^2]=1可以通过VAR(Q_{ik})=E[Q_{ik}^2]-E[Q_{ik}]^2=1得到 \\
+\end{aligned}
+\end{equation}</script><p>由上面的推导可以得到结果的分布方差变大了，除以$\sqrt{d_k}$还原的原因是$Var(cX)=c^2Var(x), \quad c是常量$</p>
+<p>具体的self-attention实现，可以参考huggingface trasnformers 的bert实现(encoder, decoder only时会加入额外的mask让attention是一个下三角阵)</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">class</span> <span class="hljs-title class_">BertSelfAttention</span>(nn.Module):<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self, config, position_embedding_type=<span class="hljs-literal">None</span></span>):<br>        <span class="hljs-built_in">super</span>().__init__()<br>        <span class="hljs-comment"># 检查hidden_size和attention头数是否是整数倍关系，不是的话head切分的时候分不开</span><br>        <span class="hljs-keyword">if</span> config.hidden_size % config.num_attention_heads != <span class="hljs-number">0</span> <span class="hljs-keyword">and</span> <span class="hljs-keyword">not</span> <span class="hljs-built_in">hasattr</span>(config, <span class="hljs-string">&quot;embedding_size&quot;</span>):<br>            <span class="hljs-keyword">raise</span> ValueError(<br>                <span class="hljs-string">f&quot;The hidden size (<span class="hljs-subst">&#123;config.hidden_size&#125;</span>) is not a multiple of the number of attention &quot;</span><br>                <span class="hljs-string">f&quot;heads (<span class="hljs-subst">&#123;config.num_attention_heads&#125;</span>)&quot;</span><br>            )<br><br>        <span class="hljs-variable language_">self</span>.num_attention_heads = config.num_attention_heads<br>        <span class="hljs-variable language_">self</span>.attention_head_size = <span class="hljs-built_in">int</span>(config.hidden_size / config.num_attention_heads)<br>        <span class="hljs-variable language_">self</span>.all_head_size = <span class="hljs-variable language_">self</span>.num_attention_heads * <span class="hljs-variable language_">self</span>.attention_head_size<br><br>        <span class="hljs-comment"># Q K V 都是先按照[hidden_size, all_head_size] 初始化的，后面按照head进行切分</span><br>        <span class="hljs-variable language_">self</span>.query = nn.Linear(config.hidden_size, <span class="hljs-variable language_">self</span>.all_head_size)<br>        <span class="hljs-variable language_">self</span>.key = nn.Linear(config.hidden_size, <span class="hljs-variable language_">self</span>.all_head_size)<br>        <span class="hljs-variable language_">self</span>.value = nn.Linear(config.hidden_size, <span class="hljs-variable language_">self</span>.all_head_size)<br><br>        <span class="hljs-variable language_">self</span>.dropout = nn.Dropout(config.attention_probs_dropout_prob)<br>        <span class="hljs-variable language_">self</span>.position_embedding_type = position_embedding_type <span class="hljs-keyword">or</span> <span class="hljs-built_in">getattr</span>(<br>            config, <span class="hljs-string">&quot;position_embedding_type&quot;</span>, <span class="hljs-string">&quot;absolute&quot;</span><br>        )<br>        <span class="hljs-keyword">if</span> <span class="hljs-variable language_">self</span>.position_embedding_type == <span class="hljs-string">&quot;relative_key&quot;</span> <span class="hljs-keyword">or</span> <span class="hljs-variable language_">self</span>.position_embedding_type == <span class="hljs-string">&quot;relative_key_query&quot;</span>:<br>            <span class="hljs-variable language_">self</span>.max_position_embeddings = config.max_position_embeddings<br>            <span class="hljs-variable language_">self</span>.distance_embedding = nn.Embedding(<span class="hljs-number">2</span> * config.max_position_embeddings - <span class="hljs-number">1</span>, <span class="hljs-variable language_">self</span>.attention_head_size)<br><br>        <span class="hljs-variable language_">self</span>.is_decoder = config.is_decoder<br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">transpose_for_scores</span>(<span class="hljs-params">self, x: torch.Tensor</span>) -&gt; torch.Tensor:<br>        <span class="hljs-comment"># shape的转换，根据head数把最后一维拆分了</span><br>        new_x_shape = x.size()[:-<span class="hljs-number">1</span>] + (<span class="hljs-variable language_">self</span>.num_attention_heads, <span class="hljs-variable language_">self</span>.attention_head_size)<br>        x = x.view(new_x_shape)  <span class="hljs-comment"># 理论上shaoe是[B, L, head_num, head_dim]</span><br>        <span class="hljs-comment"># 同时注意这里调换了dim 1 2的顺序，调换后是[B, head_num, L, head_dim]</span><br>        <span class="hljs-keyword">return</span> x.permute(<span class="hljs-number">0</span>, <span class="hljs-number">2</span>, <span class="hljs-number">1</span>, <span class="hljs-number">3</span>)<br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">forward</span>(<span class="hljs-params"></span><br><span class="hljs-params">        self,</span><br><span class="hljs-params">        hidden_states: torch.Tensor,</span><br><span class="hljs-params">        attention_mask: <span class="hljs-type">Optional</span>[torch.FloatTensor] = <span class="hljs-literal">None</span>,</span><br><span class="hljs-params">        head_mask: <span class="hljs-type">Optional</span>[torch.FloatTensor] = <span class="hljs-literal">None</span>,</span><br><span class="hljs-params">        encoder_hidden_states: <span class="hljs-type">Optional</span>[torch.FloatTensor] = <span class="hljs-literal">None</span>,</span><br><span class="hljs-params">        encoder_attention_mask: <span class="hljs-type">Optional</span>[torch.FloatTensor] = <span class="hljs-literal">None</span>,</span><br><span class="hljs-params">        past_key_value: <span class="hljs-type">Optional</span>[<span class="hljs-type">Tuple</span>[<span class="hljs-type">Tuple</span>[torch.FloatTensor]]] = <span class="hljs-literal">None</span>,</span><br><span class="hljs-params">        output_attentions: <span class="hljs-type">Optional</span>[<span class="hljs-built_in">bool</span>] = <span class="hljs-literal">False</span>,</span><br><span class="hljs-params">    </span>) -&gt; <span class="hljs-type">Tuple</span>[torch.Tensor]:<br>        mixed_query_layer = <span class="hljs-variable language_">self</span>.query(hidden_states)<br><br>        <span class="hljs-comment"># If this is instantiated as a cross-attention module, the keys</span><br>        <span class="hljs-comment"># and values come from an encoder; the attention mask needs to be</span><br>        <span class="hljs-comment"># such that the encoder&#x27;s padding tokens are not attended to.</span><br>        <span class="hljs-comment"># 这里兼容了多种处理逻辑，如果是seq2seq，那么encoder hidden state需要作为输入。不过这里是bert的实现，理论上不会作为decoder使用</span><br>        <span class="hljs-comment"># 这样实现应该是为了保持代码的统一性，也提高兼容性</span><br>        is_cross_attention = encoder_hidden_states <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span><br><br>        <span class="hljs-keyword">if</span> is_cross_attention <span class="hljs-keyword">and</span> past_key_value <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span>:  <span class="hljs-comment"># past_key_value是啥，KV的缓存值吗？</span><br>            <span class="hljs-comment"># reuse k,v, cross_attentions</span><br>            key_layer = past_key_value[<span class="hljs-number">0</span>]<br>            value_layer = past_key_value[<span class="hljs-number">1</span>]<br>            attention_mask = encoder_attention_mask<br>        <span class="hljs-keyword">elif</span> is_cross_attention:<br>            key_layer = <span class="hljs-variable language_">self</span>.transpose_for_scores(<span class="hljs-variable language_">self</span>.key(encoder_hidden_states))<br>            value_layer = <span class="hljs-variable language_">self</span>.transpose_for_scores(<span class="hljs-variable language_">self</span>.value(encoder_hidden_states))<br>            attention_mask = encoder_attention_mask<br>        <span class="hljs-keyword">elif</span> past_key_value <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span>:<br>            key_layer = <span class="hljs-variable language_">self</span>.transpose_for_scores(<span class="hljs-variable language_">self</span>.key(hidden_states))<br>            value_layer = <span class="hljs-variable language_">self</span>.transpose_for_scores(<span class="hljs-variable language_">self</span>.value(hidden_states))<br>            key_layer = torch.cat([past_key_value[<span class="hljs-number">0</span>], key_layer], dim=<span class="hljs-number">2</span>)<br>            value_layer = torch.cat([past_key_value[<span class="hljs-number">1</span>], value_layer], dim=<span class="hljs-number">2</span>)<br>        <span class="hljs-keyword">else</span>:<br>            key_layer = <span class="hljs-variable language_">self</span>.transpose_for_scores(<span class="hljs-variable language_">self</span>.key(hidden_states))<br>            value_layer = <span class="hljs-variable language_">self</span>.transpose_for_scores(<span class="hljs-variable language_">self</span>.value(hidden_states))<br><br>        query_layer = <span class="hljs-variable language_">self</span>.transpose_for_scores(mixed_query_layer)<br><br>        use_cache = past_key_value <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span><br>        <span class="hljs-keyword">if</span> <span class="hljs-variable language_">self</span>.is_decoder:<br>            <span class="hljs-comment"># if cross_attention save Tuple(torch.Tensor, torch.Tensor) of all cross attention key/value_states.</span><br>            <span class="hljs-comment"># Further calls to cross_attention layer can then reuse all cross-attention</span><br>            <span class="hljs-comment"># key/value_states (first &quot;if&quot; case)</span><br>            <span class="hljs-comment"># if uni-directional self-attention (decoder) save Tuple(torch.Tensor, torch.Tensor) of</span><br>            <span class="hljs-comment"># all previous decoder key/value_states. Further calls to uni-directional self-attention</span><br>            <span class="hljs-comment"># can concat previous decoder key/value_states to current projected key/value_states (third &quot;elif&quot; case)</span><br>            <span class="hljs-comment"># if encoder bi-directional self-attention `past_key_value` is always `None`</span><br>            past_key_value = (key_layer, value_layer)<br><br>        <span class="hljs-comment"># Take the dot product between &quot;query&quot; and &quot;key&quot; to get the raw attention scores.</span><br>        <span class="hljs-comment"># 非分布式和非flash attention的 attention score计算</span><br>        attention_scores = torch.matmul(query_layer, key_layer.transpose(-<span class="hljs-number">1</span>, -<span class="hljs-number">2</span>))  <span class="hljs-comment"># shape [B, head_num, L, L]</span><br><br>        <span class="hljs-keyword">if</span> <span class="hljs-variable language_">self</span>.position_embedding_type == <span class="hljs-string">&quot;relative_key&quot;</span> <span class="hljs-keyword">or</span> <span class="hljs-variable language_">self</span>.position_embedding_type == <span class="hljs-string">&quot;relative_key_query&quot;</span>:<br>            query_length, key_length = query_layer.shape[<span class="hljs-number">2</span>], key_layer.shape[<span class="hljs-number">2</span>]<br>            <span class="hljs-keyword">if</span> use_cache:<br>                position_ids_l = torch.tensor(key_length - <span class="hljs-number">1</span>, dtype=torch.long, device=hidden_states.device).view(<br>                    -<span class="hljs-number">1</span>, <span class="hljs-number">1</span><br>                )<br>            <span class="hljs-keyword">else</span>:<br>                position_ids_l = torch.arange(query_length, dtype=torch.long, device=hidden_states.device).view(-<span class="hljs-number">1</span>, <span class="hljs-number">1</span>)<br>            position_ids_r = torch.arange(key_length, dtype=torch.long, device=hidden_states.device).view(<span class="hljs-number">1</span>, -<span class="hljs-number">1</span>)<br>            distance = position_ids_l - position_ids_r<br><br>            positional_embedding = <span class="hljs-variable language_">self</span>.distance_embedding(distance + <span class="hljs-variable language_">self</span>.max_position_embeddings - <span class="hljs-number">1</span>)<br>            positional_embedding = positional_embedding.to(dtype=query_layer.dtype)  <span class="hljs-comment"># fp16 compatibility</span><br><br>            <span class="hljs-keyword">if</span> <span class="hljs-variable language_">self</span>.position_embedding_type == <span class="hljs-string">&quot;relative_key&quot;</span>:<br>                relative_position_scores = torch.einsum(<span class="hljs-string">&quot;bhld,lrd-&gt;bhlr&quot;</span>, query_layer, positional_embedding)<br>                attention_scores = attention_scores + relative_position_scores<br>            <span class="hljs-keyword">elif</span> <span class="hljs-variable language_">self</span>.position_embedding_type == <span class="hljs-string">&quot;relative_key_query&quot;</span>:<br>                relative_position_scores_query = torch.einsum(<span class="hljs-string">&quot;bhld,lrd-&gt;bhlr&quot;</span>, query_layer, positional_embedding)<br>                relative_position_scores_key = torch.einsum(<span class="hljs-string">&quot;bhrd,lrd-&gt;bhlr&quot;</span>, key_layer, positional_embedding)<br>                attention_scores = attention_scores + relative_position_scores_query + relative_position_scores_key<br><br>        <span class="hljs-comment"># 除了math.sqrt(self.attention_head_size) 矩阵相乘之后的方差变成了attention_head_size(这个是每个head的dim)</span><br>        <span class="hljs-comment"># 除attention_head_size进行归一化，不然的话数值之间的差值会被softmax过分放大，导致softmax之后的熵很低</span><br>        attention_scores = attention_scores / math.sqrt(<span class="hljs-variable language_">self</span>.attention_head_size)<br>        <span class="hljs-keyword">if</span> attention_mask <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span>:<br>            <span class="hljs-comment"># Apply the attention mask is (precomputed for all layers in BertModel forward() function)</span><br>            attention_scores = attention_scores + attention_mask<br><br>        <span class="hljs-comment"># Normalize the attention scores to probabilities.</span><br>        attention_probs = nn.functional.softmax(attention_scores, dim=-<span class="hljs-number">1</span>)<br><br>        <span class="hljs-comment"># This is actually dropping out entire tokens to attend to, which might</span><br>        <span class="hljs-comment"># seem a bit unusual, but is taken from the original Transformer paper.</span><br>        attention_probs = <span class="hljs-variable language_">self</span>.dropout(attention_probs)    <span class="hljs-comment"># 得到attention score的最终结果</span><br><br>        <span class="hljs-comment"># Mask heads if we want to</span><br>        <span class="hljs-comment"># mask head 是以head维度进行mask吗？那样会不会导致结果太稀疏了</span><br>        <span class="hljs-keyword">if</span> head_mask <span class="hljs-keyword">is</span> <span class="hljs-keyword">not</span> <span class="hljs-literal">None</span>:<br>            attention_probs = attention_probs * head_mask<br><br>        <span class="hljs-comment"># attention score和 V进行相乘</span><br>        context_layer = torch.matmul(attention_probs, value_layer)   <span class="hljs-comment"># shape [B, head_num, L, L] * [B, head_num, L, head_dim] -&gt;[B, head_num, L, head_dim] </span><br><br>        <span class="hljs-comment"># 把head这个维度换回去, [B, L, head_num, head_dim]  contiguous这个function是为了调整多维tensor在内存中的存储方式, torch和numpy的原始多维数组在内存中其实都是一维连续存储的，一些转置方法permute transpose不会改变原始的一维存储方式，只是取数据的时候按转置后的规则进行组织。但是如果使用view function操作这些转置之后的tensor会报错，需要用contiguous方法调整原始一维数组的存储方式，和转置后对齐</span><br>        context_layer = context_layer.permute(<span class="hljs-number">0</span>, <span class="hljs-number">2</span>, <span class="hljs-number">1</span>, <span class="hljs-number">3</span>).contiguous()   <span class="hljs-comment"># [B, L, head_num, head_dim]</span><br>        new_context_layer_shape = context_layer.size()[:-<span class="hljs-number">2</span>] + (<span class="hljs-variable language_">self</span>.all_head_size,)  <span class="hljs-comment"># new shape [B, L, all_head_size] all_head_size head_dim 乘以 head_num</span><br>        context_layer = context_layer.view(new_context_layer_shape)  <span class="hljs-comment"># 把所有头拼回来 [B, L, all_head_size] </span><br><br>        outputs = (context_layer, attention_probs) <span class="hljs-keyword">if</span> output_attentions <span class="hljs-keyword">else</span> (context_layer,)<br><br>        <span class="hljs-keyword">if</span> <span class="hljs-variable language_">self</span>.is_decoder:<br>            outputs = outputs + (past_key_value,)<br>        <span class="hljs-keyword">return</span> outputs<br></code></pre></td></tr></table></figure>
+<p>提取一下核心的部分</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">self_att</span>(<span class="hljs-params">input_tensor, all_head_dim, head_num, mask</span>):<br>    <span class="hljs-comment"># 先定义Q K V</span><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">trans</span>(<span class="hljs-params">output, head_num, per_head_dim</span>):<br>        new_shape = output.shape[:-<span class="hljs-number">1</span>] + (head_num, per_head_dim)<br>        output = output.view(new_shape)<br>        <span class="hljs-comment"># 进行维度转置</span><br>        output = output.permute(<span class="hljs-number">0</span>, <span class="hljs-number">2</span>, <span class="hljs-number">1</span>, <span class="hljs-number">3</span>)  <span class="hljs-comment"># shape [B, head_num, L, per_head_dim]</span><br>        <span class="hljs-keyword">return</span> output<br>    <span class="hljs-comment"># 先定义Q K V</span><br>    per_head_dim = <span class="hljs-built_in">int</span>(all_head_dim / head_num)<br>    Q_layer = torch.nn.Linear(input_tensor.shape[-<span class="hljs-number">1</span>], <span class="hljs-variable language_">self</span>.all_head_size)<br>    K_layer = torch.nn.Linear(input_tensor.shape[-<span class="hljs-number">1</span>], <span class="hljs-variable language_">self</span>.all_head_size)<br>    V_layer = torch.nn.Linear(input_tensor.shape[-<span class="hljs-number">1</span>], <span class="hljs-variable language_">self</span>.all_head_size)<br>    <span class="hljs-comment"># 过线性层并进行shape转换</span><br>    Q = trans(Q_layer(input_tensor), head_num, per_head_dim)<br>    K = trans(K_layer(input_tensor), head_num, per_head_dim)<br>    V = trans(V_layer(input_tensor), head_num, per_head_dim)<br><br>    <span class="hljs-comment"># 计算attention score</span><br>    att_score = torch.matmul(Q, K.transpose(-<span class="hljs-number">1</span>, -<span class="hljs-number">2</span>))<br>    <span class="hljs-comment"># 归一化, 某些特定权重初始化方法可以省略该归一化</span><br>    att_score = att_score / math.sqrt(per_head_dim)  <span class="hljs-comment"># shape [B, head_num, L, L]</span><br>    att_score = softmax(att_score, dim=-<span class="hljs-number">1</span>)<br>    <span class="hljs-comment"># 加入attention mask</span><br>    att_score = att_score + mask<br>    V = torch.matmul(att_score, V)  <span class="hljs-comment"># shape [B, head_num, L, per_head_dim]</span><br>    <span class="hljs-comment"># 合并多头</span><br>    V = V.permute(<span class="hljs-number">0</span>, <span class="hljs-number">2</span>, <span class="hljs-number">1</span>, <span class="hljs-number">3</span>).contiguous()<br>    new_shape = V.shape[:-<span class="hljs-number">2</span>] + (all_head_dim)<br>    V = V.view(new_shape)<br><br>    <span class="hljs-keyword">return</span> V<br></code></pre></td></tr></table></figure>
+<h2 id="MHA的改进-MQA-Multi-Query-Attention"><a href="#MHA的改进-MQA-Multi-Query-Attention" class="headerlink" title="MHA的改进 MQA Multi Query Attention"></a>MHA的改进 MQA Multi Query Attention</h2><p>Multi Query Attention 和 Group Query Attention是两种常见的MHA优化方案，其优化和KV Cache有关系，KV Cache通过缓存K矩阵和V矩阵的中间结果来避免重新计算。但是随着模型规模越来越大，head数越来越多，如果把KV Cache放在SRAM中空间不够。MQA考虑给K V “瘦身”，同时训练的时候这部分算的少了，也对放大预训练文本长度有帮助。</p>
+<p>Multi Query Attention，非常暴力的方案，只有query保留multi head，key 和 query只保留一个head。 这样kv cache中需要保存的内容可以按head数线性减少。</p>
+<p>根据标准MHA代码改一下可以实现</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">self_att_MQA</span>(<span class="hljs-params">input_tensor, all_head_dim, head_num, k_dim, v_dim, mask</span>):<br>    <span class="hljs-string">&quot;&quot;&quot;</span><br><span class="hljs-string">    Multi query Att的实现方式，基于MHA修改</span><br><span class="hljs-string">    k_dim v_dim都应该和per_head_dim相同，这样才可以矩阵乘法计算att_score</span><br><span class="hljs-string">    Argument:</span><br><span class="hljs-string">        input_tensor: 输入 input</span><br><span class="hljs-string">        all_head_dim: query所有head合并后的维度</span><br><span class="hljs-string">        head_num: query的head数量</span><br><span class="hljs-string">        k_dim: key线性变换的维度, 只有一个head 不做拆分</span><br><span class="hljs-string">        v_dim: value线性变换的维度, 只有一个head 不做拆分</span><br><span class="hljs-string">    &quot;&quot;&quot;</span><br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">trans</span>(<span class="hljs-params">output, head_num, per_head_dim</span>):<br>        new_shape = output.shape[:-<span class="hljs-number">1</span>] + (head_num, per_head_dim)<br>        output = output.view(new_shape)<br>        <span class="hljs-comment"># 进行维度转置</span><br>        output = output.permute(<span class="hljs-number">0</span>, <span class="hljs-number">2</span>, <span class="hljs-number">1</span>, <span class="hljs-number">3</span>)  <span class="hljs-comment"># shape [B, head_num, L, per_head_dim]</span><br>        <span class="hljs-keyword">return</span> output<br>    <span class="hljs-comment"># 先定义Q K V</span><br>    per_head_dim = <span class="hljs-built_in">int</span>(all_head_dim / head_num)<br>    Q_layer = torch.nn.Linear(input_tensor.shape[-<span class="hljs-number">1</span>], <span class="hljs-variable language_">self</span>.all_head_size)<br>    K_layer = torch.nn.Linear(input_tensor.shape[-<span class="hljs-number">1</span>], k_dim)   <br>    V_layer = torch.nn.Linear(input_tensor.shape[-<span class="hljs-number">1</span>], v_dim)   <br>    <span class="hljs-comment"># 过线性层并进行shape转换</span><br>    Q = trans(Q_layer(input_tensor), head_num, per_head_dim)  <span class="hljs-comment"># res shape [B, head_num, L, per_head_dim]</span><br>    K = K_layer(input_tensor) <span class="hljs-comment"># res shape [B, L, k_dim]</span><br>    V = V_layer(input_tensor) <span class="hljs-comment"># res shape [B, L, v_dim]</span><br>    <span class="hljs-comment"># K = trans(K_layer(input_tensor))</span><br>    <span class="hljs-comment"># V = trans(V_layer(input_tensor))</span><br><br>    <span class="hljs-comment"># 计算attention score, 注意这里k只有一个头 shape和query不一致，要做广播改变key的shape 矩阵乘法时pytorch会自动把维度为1的维度广播成另一个tensor对应维度数量</span><br>    K = K.unsqueeze(<span class="hljs-number">1</span>)  <span class="hljs-comment"># shape [B, 1, L, k_dim]</span><br>    att_score = torch.matmul(Q, K.transpose(-<span class="hljs-number">1</span>, -<span class="hljs-number">2</span>))<br>    <span class="hljs-comment"># 归一化, 某些特定权重初始化方法可以省略该归一化</span><br>    att_score = att_score / math.sqrt(per_head_dim)  <span class="hljs-comment"># shape [B, head_num, L, L]</span><br>    att_score = softmax(att_score, dim=-<span class="hljs-number">1</span>)<br>    <span class="hljs-comment"># 加入attention mask</span><br>    att_score = att_score + mask<br>    <span class="hljs-comment"># 同样对V做广播</span><br>    V = V.unsqueeze(<span class="hljs-number">1</span>)<br>    V = torch.matmul(att_score, V)  <span class="hljs-comment"># shape [B, head_num, L, v_dim]</span><br>    <span class="hljs-comment"># 合并多头</span><br>    V = V.permute(<span class="hljs-number">0</span>, <span class="hljs-number">2</span>, <span class="hljs-number">1</span>, <span class="hljs-number">3</span>).contiguous()<br>    new_shape = V.shape[:-<span class="hljs-number">2</span>] + (all_head_dim)<br>    V = V.view(new_shape)<br><br>    <span class="hljs-keyword">return</span> V<br></code></pre></td></tr></table></figure>
+<h2 id="在MHA和MQA之间的折中方案-GQA-Group-Query-Attention"><a href="#在MHA和MQA之间的折中方案-GQA-Group-Query-Attention" class="headerlink" title="在MHA和MQA之间的折中方案 GQA Group Query Attention"></a>在MHA和MQA之间的折中方案 GQA Group Query Attention</h2><p>Group Query Attention: MQA降低了显存，但和MHA的初衷相比，减少K V head数可能会影响表征的空间数，进而降低表示能力。与MQA相比，GQA没有那么暴力，key 和 value不再只有一个头，而是分成group，每个group中共享一个head。具体的实现为</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">self_att_GQA</span>(<span class="hljs-params">input_tensor, all_head_dim, head_num, k_dim, v_dim, group_num, mask</span>):<br>    <span class="hljs-string">&quot;&quot;&quot;</span><br><span class="hljs-string">    Group query Att的实现方式，基于MHA修改</span><br><span class="hljs-string">    k_dim v_dim都应该 = per_head_dim * group_num，这样才可以矩阵乘法计算att_score</span><br><span class="hljs-string">    Argument:</span><br><span class="hljs-string">        input_tensor: 输入 input</span><br><span class="hljs-string">        all_head_dim: query所有head合并后的维度</span><br><span class="hljs-string">        head_num: query的head数量</span><br><span class="hljs-string">        k_dim: key线性变换的维度, 多组共享一个head </span><br><span class="hljs-string">        v_dim: value线性变换的维度, 多组共享一个head </span><br><span class="hljs-string">        group_num: K V group的数量</span><br><span class="hljs-string">    &quot;&quot;&quot;</span><br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">trans</span>(<span class="hljs-params">output, head_num, per_head_dim</span>):<br>        new_shape = output.shape[:-<span class="hljs-number">1</span>] + (head_num, per_head_dim)<br>        output = output.view(new_shape)<br>        <span class="hljs-comment"># 进行维度转置</span><br>        output = output.permute(<span class="hljs-number">0</span>, <span class="hljs-number">2</span>, <span class="hljs-number">1</span>, <span class="hljs-number">3</span>)  <span class="hljs-comment"># shape [B, head_num, L, per_head_dim]</span><br>        <span class="hljs-keyword">return</span> output<br>    <span class="hljs-comment"># 先定义Q K V</span><br>    per_head_dim_q = <span class="hljs-built_in">int</span>(all_head_dim / head_num)<br>    per_head_dim_k = <span class="hljs-built_in">int</span>(k_dim / group_num)<br>    per_head_dim_v = <span class="hljs-built_in">int</span>(v_dim / group_num)<br>    <span class="hljs-keyword">assert</span> per_head_dim_q == per_head_dim_k <span class="hljs-keyword">and</span> per_head_dim_k == per_head_dim_v<br>    Q_layer = torch.nn.Linear(input_tensor.shape[-<span class="hljs-number">1</span>], <span class="hljs-variable language_">self</span>.all_head_size)<br>    K_layer = torch.nn.Linear(input_tensor.shape[-<span class="hljs-number">1</span>], k_dim)   <br>    V_layer = torch.nn.Linear(input_tensor.shape[-<span class="hljs-number">1</span>], v_dim)   <br>    <span class="hljs-comment"># 过线性层并进行shape转换</span><br>    Q = trans(Q_layer(input_tensor), head_num, per_head_dim_q)  <span class="hljs-comment"># res shape [B, head_num, L, per_head_dim]</span><br>    K = trans(K_layer(input_tensor), group_num, per_head_dim_k) <span class="hljs-comment"># res shape [B, g_n, L, per_head_dim]</span><br>    V = trans(V_layer(input_tensor), group_num, per_head_dim_v) <span class="hljs-comment"># res shape [B, g_n, L, per_head_dim]</span><br><br>    <span class="hljs-comment"># 计算attention score, 注意这里k和q的头数本质上不一样， query 和 key的第二个维度不一致，分别为head_num和group_num，为了达到这种分组相乘的效果，先对Q进行分组</span><br>    Q = Q.view(Q.shape[<span class="hljs-number">0</span>] + (group_num, <span class="hljs-built_in">int</span>(head_num/group_num)), Q.shape[-<span class="hljs-number">2</span>: ]) <span class="hljs-comment"># shape [B, group_num, per_group_head, L, per_head_dim]</span><br>    K = K.unsqueeze(<span class="hljs-number">2</span>)   <span class="hljs-comment"># shape [B, g_n, 1, L, per_head_dim]</span><br>    att_score = torch.matmul(Q, K.transpose(-<span class="hljs-number">1</span>, -<span class="hljs-number">2</span>))<br>    <span class="hljs-comment"># 归一化, 某些特定权重初始化方法可以省略该归一化</span><br>    att_score = att_score / math.sqrt(per_head_dim)  <span class="hljs-comment"># shape [B, group_num, per_group_head_num, L, L]</span><br>    att_score = softmax(att_score, dim=-<span class="hljs-number">1</span>)<br>    <span class="hljs-comment"># 加入attention mask</span><br>    att_score = att_score + mask<br>    <span class="hljs-comment"># 同样对V做广播   这里的实现是自己写的，看了一些其他的实现，比如qwen，他是通过tensor的expand方法将k 和 v的group维度按group复制到了head_num，之后继续正常计算，我在这里的实现没有考虑KV Cache，也没有验证最终结果是否准确</span><br>    V = V.unsqueeze(<span class="hljs-number">2</span>)<br>    O = torch.matmul(att_score, V)  <span class="hljs-comment"># shape [B, group_num, per_group_head_num, L, per_head_dim]</span><br>    <span class="hljs-comment"># 合并多组多头</span><br>    O = O.view([V.shape[<span class="hljs-number">0</span>] + (head_num) + V.shape[-<span class="hljs-number">2</span>:]])<br>    O = O.permute(<span class="hljs-number">0</span>, <span class="hljs-number">2</span>, <span class="hljs-number">1</span>, <span class="hljs-number">3</span>).contiguous()<br>    new_shape = V.shape[:-<span class="hljs-number">2</span>] + (all_head_dim)<br>    O = O.view(new_shape)<br><br>    <span class="hljs-keyword">return</span> O<br></code></pre></td></tr></table></figure>
+<h2 id="来自deepseek的MHA-改进-MLA-Multi-head-Latent-Attention"><a href="#来自deepseek的MHA-改进-MLA-Multi-head-Latent-Attention" class="headerlink" title="来自deepseek的MHA 改进 MLA Multi-head Latent Attention"></a>来自deepseek的MHA 改进 MLA Multi-head Latent Attention</h2><p>参考资料:</p>
+<ol>
+<li>知乎：再读MLA，还有多少细节是你不知道的<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/19585986234">https://zhuanlan.zhihu.com/p/19585986234</a></li>
+<li>知乎：deepseek MLA推理优化<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/23081000392">https://zhuanlan.zhihu.com/p/23081000392</a></li>
+<li>苏剑林：缓存与效果的极限拉扯：从MHA、MQA、GQA到MLA <a target="_blank" rel="noopener" href="https://kexue.fm/archives/10091">https://kexue.fm/archives/10091</a></li>
+</ol>
+<p>GQA和MQA都是直接减少了K和V的head数，以此减少推理时KV Cache的显存占用</p>
+<p>而MLA使用了另一种思路，类似LoRA的低秩思路，训练一个down-projection matrix来对原始输入x做低维投影得到c，之后还有up-projection matrix 把c投影到高维作为K。并且其目标是在存KV Cache的时候只存这个c，推理的时候KV Cache的存储占用降低，并且原始的K V投影矩阵由于低秩分解参数量也降低了，这样计算量也减小了(这个地方没有深究，看了一下有些人的计算，其认为MLA的计算量比MQA大，但是比MHA小，可能是由于优化了访存推理并且batch_size变大才快，推理阶段计算非瓶颈，访存才是)。训练的时候提效。具体的形式化表述为</p>
+<script type="math/tex; mode=display">
+\begin{equation}
+\begin{aligned}
+c_t^{KV}&=W^{DKV}h_{t}\\
+k_{t}^{c} &= W^{UK}c_{t}^{KV}\\
+v_{t}^{c} &= W^{UV}c_{t}^{KV}\\
+\end{aligned}
+\end{equation}</script><p>让我们观察一些细节，首先MLA缓存的是低维投影的c(理论是这么说的，但是deepseek开源的初版代码缓存的是升维后的kv，后期其他团队提交了合理的代码)，而非高维投影还原后的k 和 v。正常来说为了避免新token加入的时候重新计算up projection操作，应该直接缓存k 和 v，但是这样和MHA的KV Cache大小没有任何区别，没有起到减少显存占用的目的。</p>
+<p>MLA缓存down projection之后的向量c，KV Cache具体的应用方式参考<a target="_blank" rel="noopener" href="https://kexue.fm/archives/10091">https://kexue.fm/archives/10091</a>中的解释</p>
+<p>按现在的低秩投影表示方式，q和k的dot attention可以写成</p>
+<script type="math/tex; mode=display">q_t^{(s)} k_i^{(s)T}=\left(x_tW_{q}^{(s)} \right) \left( c_iW^{(UK)}\right)^T=x_t\left(W_q^{(s)}W^{(UK)T} \right)c_i^T</script><p>通过这种方式推理的时候可以只存c, 并且这两个矩阵Wq和k的升维矩阵可以合并，这样推理的时候计算开销更小。</p>
+<h3 id="如何与ROPE结合？"><a href="#如何与ROPE结合？" class="headerlink" title="如何与ROPE结合？"></a>如何与ROPE结合？</h3><p>推理的时候和RoPE是不兼容的，因为MLA推理时为了提效仅缓存了c，并且为了减少运算量，把前面的两个矩阵融合了。但是RoPE是对角矩阵乘到q和k上的，在推理时由于矩阵融合，不会把压缩的c升维回k，这样rope向量没法加到q和k上。</p>
+<p>把RoPE矩阵也融合到$W^Q$和$W^K$的计算中可以吗？答案是不行，原始的attenton计算是</p>
+<script type="math/tex; mode=display">q_t^{(s)} k_i^{(s)T}=\left(x_tW_{q}^{(s)} \right) \left( c_iW^{(UK)}\right)^T</script><p>如果$R表示ROPE的对角阵,R<em>{m}R</em>{n}^T=R_{m-n}$，那么attention score部分的计算可以写成</p>
+<script type="math/tex; mode=display">q_t^{(s)} k_i^{(s)T}=\left(x_tW_{q}^{(s)}R_t \right) \left( c_iW^{(UK)}R_i\right)^T=x_t\left(W_q^{(s)}R_{t-i}W^{(UK)T} \right)c_i^T</script><p>由于矩阵乘法不满足交换律，同时中间的这个ROPE矩阵和位置有关系，每次输入的序列长度会变，那么这个结果就可能不同，所以这两个投影矩阵没办法提前融合，如果推理的时候重新计算，效率就降低了</p>
+<p>为了解决这个问题MLA的方式是在q的后面concat一定的维度作为ROPE编码的位置，直接作为加性位置编码加进去，根据他们的结果看起来也是有效果的。</p>
+<h3 id="矩阵吸收的细节"><a href="#矩阵吸收的细节" class="headerlink" title="矩阵吸收的细节"></a>矩阵吸收的细节</h3><p>MLA在对KV做了低秩投影之后，KV Cache可以缓存投影后的结果, 减小存储压力，但是在推理时需要将低秩的C通过升维投影矩阵还原回K，通过升维投影矩阵，这个矩阵乘法计算量和序列长度正相关。一般是$[bs, k_len, k_low_rank_dim]\times[k_low_rank_dim, (k_dim+rope_dim)<em>head_num]$，这个升维操作矩阵计算量很大，计算量和序列长度正相关，计算数是 $bs\times2\times k_len\times k_low_rank_dim\times((k_dim+rope_dim)</em>head_num)$。（矩阵乘法的计算量，乘法和加法操作的总量，可以简单推导获得）</p>
+<p>通过矩阵吸收将这部分升维矩阵的操作吸收到Q的计算部分，可以降低计算量(吸收，不同的博文里概念不同，有的吸收是q升维后乘KV的升为矩阵就叫吸收，有的认为是把q升维矩阵和kv升维矩阵直接合并了才叫吸收。具体计算量有一些额外的讨论<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/24013149030">https://zhuanlan.zhihu.com/p/24013149030</a>, 似乎所有的框架实现时的吸收操作都为前者)。因为一般在decode阶段q的长度只有1。Q部分在计算完成后结果大小为$[bs, head_num, q_len, nope]$，此时把K的升维矩阵$[head_num, nope, k_lowRank_dim]$乘进去，计算量与k序列长度无关。</p>
+<p>还有一个细节是在计算attention score的时候，由于rope的部分是concat上去的，所以想得到结果有两种等价运算方式:</p>
+<p>a. 一种是把q和k的rope部分先concat上去，之后算self-attention</p>
+<p>b. q和k的部分单独计算，rope部分也单独计算，最后二者相加</p>
+<p>在目前的MLA实现版本中，一般是选择b的，原因是避免额外的显存开销，如果先concat，一般是先初始化空tensor之后把结果放进去，分开计算不会有这个操作。</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
@@ -187,137 +251,55 @@
 		</ul>
 	</div>
 
-          
+      
 
-        </div>
-        <div class="clearfix"></div>
-    </header>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2025/06/24/flashattention_%E5%8E%9F%E7%90%86%E9%80%9F%E8%AE%B0/" class="archive-article-date">
-  	<time datetime="2025-06-24T13:08:45.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2025-06-24</time>
-</a>
+<nav id="article-nav">
+  
+  
+    <a href="/2025/06/24/flashattention_%E5%8E%9F%E7%90%86%E9%80%9F%E8%AE%B0/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">鹦鹉学舌-flash-attention 原理速记</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
         </div>
-    	 
+        
+        
+    </div>
+</aside>
+
+
+
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2025/06/24/flashattention_%E5%8E%9F%E7%90%86%E9%80%9F%E8%AE%B0/">鹦鹉学舌-flash-attention 原理速记</a>
-    </h1>
+  
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">深度学习</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2025/06/13/%E6%A8%A1%E5%9E%8B%E8%BD%AConnx-tensorRT-triton_server%E9%83%A8%E7%BD%B2%E5%AE%9E%E8%B7%B5%E8%AE%B0%E5%BD%95/" class="archive-article-date">
-  	<time datetime="2025-06-13T12:47:18.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2025-06-13</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2025/06/13/%E6%A8%A1%E5%9E%8B%E8%BD%AConnx-tensorRT-triton_server%E9%83%A8%E7%BD%B2%E5%AE%9E%E8%B7%B5%E8%AE%B0%E5%BD%95/">模型转onnx-tensorRT, triton_server部署推理实践记录</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">模型推理实践</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2025/04/23/%E9%87%8D%E5%90%AF%E5%8D%9A%E5%AE%A2%E6%B5%8B%E8%AF%95%E4%B8%80%E4%B8%8B%E5%8A%9F%E8%83%BD/" class="archive-article-date">
-  	<time datetime="2025-04-23T15:52:57.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2025-04-23</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2025/04/23/%E9%87%8D%E5%90%AF%E5%8D%9A%E5%AE%A2%E6%B5%8B%E8%AF%95%E4%B8%80%E4%B8%8B%E5%8A%9F%E8%83%BD/">测试博客_对一些内容和功能进行测试</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">机器学习</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">自然语言处理</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
   
-  
-    </div></section>
-  
-
-    
 
 
           </div>
@@ -340,8 +322,8 @@
 	var yiliaConfig = {
 		mathjax: true,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: false,

@@ -15,17 +15,12 @@
 <meta property="og:site_name" content="兴趣使然的博客_HeZez">
 <meta property="og:description" content="本笔记主要用于记录本人学习过程，笔者小白一只，针对文中出现错误，欢迎交流讨论。  &emsp;&emsp;梯度这个概念对于了解机器学习的同学来说是个非常熟悉的的概念，各种优化问题总能看到梯度下降的身影，那么强化学习中的策略梯度是什么呢？">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="https://hezez.github.io/assets/img/blog2_policy_gradient/1.png">
-<meta property="og:image" content="https://hezez.github.io/assets/img/blog2_policy_gradient/2.png">
-<meta property="og:image" content="https://hezez.github.io/assets/img/blog2_policy_gradient/3.png">
-<meta property="og:image" content="https://hezez.github.io/assets/img/blog2_policy_gradient/4.png">
 <meta property="article:published_time" content="2020-04-22T12:57:56.000Z">
 <meta property="article:modified_time" content="2020-04-22T13:45:52.892Z">
 <meta property="article:author" content="HeZez">
 <meta property="article:tag" content="机器学习">
 <meta property="article:tag" content="强化学习">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://hezez.github.io/assets/img/blog2_policy_gradient/1.png">
   
     <link rel="alternative" href="/atom.xml" title="兴趣使然的博客_HeZez" type="application/atom+xml">
   
@@ -174,13 +169,12 @@
         <blockquote>
 <p>本笔记主要用于记录本人学习过程，笔者小白一只，针对文中出现错误，欢迎交流讨论。</p>
 </blockquote>
-<p>&emsp;&emsp;梯度这个概念对于了解机器学习的同学来说是个非常熟悉的的概念，各种优化问题总能看到梯度下降的身影，那么强化学习中的策略梯度是什么呢？</p>
-<span id="more"></span>
-<p>&emsp;&emsp;策略梯度可以拿来解决连续状态空间和动作空间的问题，这是原始表格型的原始Q-learning无法做到的。和Q-learning去拟合Q函数不同，策略梯度类的方法希望直接通过函数逼近器去拟合一个“策略函数”。现在深度学习大行其道，函数逼近器当然选择神经网络了，算法最开始提出的时候使用的什么笔者没有去考究。</p>
+<p>&emsp;&emsp;梯度这个概念对于了解机器学习的同学来说是个非常熟悉的的概念，各种优化问题总能看到梯度下降的身影，那么强化学习中的策略梯度是什么呢？<br><span id="more"></span><br>&emsp;&emsp;策略梯度可以拿来解决连续状态空间和动作空间的问题，这是原始表格型的原始Q-learning无法做到的。和Q-learning去拟合Q函数不同，策略梯度类的方法希望直接通过函数逼近器去拟合一个“策略函数”。现在深度学习大行其道，函数逼近器当然选择神经网络了，算法最开始提出的时候使用的什么笔者没有去考究。</p>
 <h3 id="一、基础问题定义与形式化"><a href="#一、基础问题定义与形式化" class="headerlink" title="一、基础问题定义与形式化"></a>一、基础问题定义与形式化</h3><p>&emsp;&emsp;策略梯度一般用来解决连续状态、动作空间中的决策问题，举个例子来说呢，可以是下面这样的。<br>&emsp;&emsp;图片来自UCBcs294课程的PPT</p>
 <div align=center>
 
-<p><img src="/assets/img/blog2_policy_gradient/1.png" alt="问题形式"> </p>
+![问题形式](/assets/img/blog2_policy_gradient/1.png) 
+
 </div>
 
 
@@ -188,44 +182,66 @@
 <p>&emsp;&emsp;对于强化学习，我们习惯于使用马尔科夫决策过程(Markov Decision Process, MDP)对问题进行描述,其本身是马尔科夫过程的一种推广，加入了决策的因素，详细的介绍这里不多说了，形式如下图。</p>
 <div align=center>
 
-<p><img src="/assets/img/blog2_policy_gradient/2.png" alt="MDP"> </p>
+![MDP](/assets/img/blog2_policy_gradient/2.png) 
+
 </div>
 
 <p>&emsp;&emsp;基于以上对一个强化学习问题的设定，我们可以得到如下的一些结果，首先是一个概率，$p(\tau)$，其中$\tau$表示一整条马尔科夫决策过程的轨迹$(s_1,a_1,r_1,…,s_T,a_T,r_T)$，T表示轨迹的长度，$p(\tau)$表示整条轨迹出现的概率。</p>
-<p>$$p(\tau)&#x3D;p(s_1)\prod_{t&#x3D;1}^T\pi_\theta(a_t|s_t)p(s_{t+1}|s_t,a_t)$$</p>
-<p>&emsp;&emsp;其中 $p(s_1)$ 表示的是初始概率分布， $p(s_{t+1}|s_t,a_t)$ 表示和决策相关的状态转移概率， $\pi_\theta(a_t|s_t)$ 表示我们的决策函数， $\theta$ 是决策函数的参数。</p>
-<p>&emsp;&emsp;策略梯度方法的目标就是得到一组能够使期望累积reward最大的策略函数参数，形式化一下就是下面公式这个样子，多数的文献中会引入折扣因子 $\gamma$，我这里为了便于理解就先不加了。<br>$$<br>Goal:\theta^\star&#x3D;\arg\max_{\theta}E_{\tau-p_{\theta}(\tau)}[ \sum_t{r(s_t,a_t)} ]<br>$$</p>
-<p>&emsp;&emsp;由此我们可以写出一个优化的目标函数：</p>
-<p>$$J(\theta)&#x3D;E_{\tau-p_{\theta}(\tau)}[\sum_t{r(s_t,a_t)}]$$</p>
-<h3 id="二、优化问题求解"><a href="#二、优化问题求解" class="headerlink" title="二、优化问题求解"></a>二、优化问题求解</h3><p>&emsp;&emsp;上一节中提到了我们的优化目标，也给出了优化问题的具体形式，那么我们怎样求解呢？看起来毫无头绪，那么让我们回过头来看一下这个优化问题，这里为了书写方便用$r(\tau)$代替$\sum_t{r(s_t,a_t)}$，同时根据期望的定义，优化问题可以进一步展开写成如下形式。</p>
-<p>$$J(\theta)&#x3D;E_{\tau-p_{\theta}(\tau)}[r(\tau)]&#x3D;{\displaystyle \int p_{\theta}(\tau) r(\tau) d\tau}$$</p>
-<p>&emsp;&emsp;具体如何求解我们还是求助于老朋友梯度下降，我们希望对这个优化目标函数求梯度，我们动手来推导一下$J(\theta)$的梯度项，首先说明一下这里有一个trick，对于$\nabla_{\theta}p_{\theta}(\tau)$有这样一个等式成立$\nabla_{\theta}p_{\theta}(\tau)&#x3D;p_{\theta}(\tau)\nabla_{\theta}\log{p_{\theta}(\tau)}$，根据log复合函数的求导法则可以很容易的得到这个等式。<br>&emsp;&emsp;对梯度项应用上面的trick，可以得到这样的结果。</p>
-<p>$$<br>\begin{aligned}<br>\nabla_{\theta}J &amp;&#x3D; {\displaystyle \int \nabla_{\theta} p_{\theta}(\tau) r(\tau) d\tau}\\<br>   &amp;&#x3D;{\displaystyle \int  p_{\theta}(\tau) \nabla_{\theta} \log{p_{\theta}(\tau)} r(\tau) d\tau}\\<br>   &amp;&#x3D;E_{\tau-p_{\theta}(\tau)}[\nabla_{\theta} \log{p_{\theta}(\tau)} r(\tau)]<br>\end{aligned}<br>$$</p>
-<p>&emsp;&emsp;这个trick的目的是什么呢？<br>&emsp;&emsp;首先，这个期望的形式看起来是不是有一些熟悉，感觉和极大似然(Maximum Likelihood Estimate，MLE)有几分相似，直观理解一下，就像是在极大似然中引入了累积reward作为权重一样。同时对于这$\nabla_{\theta}\log{p_{\theta}(\tau)}$这一项其实还有文章可做，记得前面对$p_{\theta}(\tau)$的展开吗？累乘的形式在log函数下可以化为累加，因为我们我们想要针对$\theta$求梯度，从这个展开式中来看，初始状态分布和状态转移概率和$\theta$没有关系，所以在求导的时候这些项都被消去了。具体的过程如下：</p>
-<p>$$<br>\begin{aligned}<br>\nabla_{\theta} \log{p_{\theta}(\tau)} &amp;&#x3D; \nabla_{\theta} {\log{p(s_1)} +\sum_{t&#x3D;1}^T[\log{\pi_{\theta}(a_y|s_t)} +\log{p(s_{t+1}|s_t,a_t)} ]} \\<br> &amp;&#x3D; \nabla_{\theta} \sum_{t&#x3D;1}^T \log{\pi_{\theta}(a_t|s_t)}\\<br>\nabla_{\theta}J &amp;&#x3D; E_{\tau-p_{\theta}(\tau)}[ \sum_{t&#x3D;1}^T \nabla_{\theta} \log{\pi_{\theta}(a_t|s_t)}  \sum_{t&#x3D;1}^T{r(s_t,a_t)}]<br>\end{aligned}<br>$$</p>
-<p>&emsp;&emsp;梯度项变成了一个期望，但问题还是怎么计算呢？这里使用了蒙特卡洛估计，也就是通过采样的方式去计算期望的估计：</p>
-<p>$$\nabla_{\theta}J \approx \frac{1}{N} \sum_{i&#x3D;1}^N<br>[ (\sum_{t&#x3D;1}^T \nabla_{\theta} \log{\pi_{\theta}(a_{i,t}|s_{i,t})})<br>(\sum_{t&#x3D;1}^T r(s_{i,t},a_{i,t}) ) ]$$</p>
-<p>&emsp;&emsp;将以上的步骤整合一下，我们就得到了一个经典的强化学习算法REINFORCE,有兴趣的同学可以去找这篇原文来读一读，很经典。</p>
+<script type="math/tex; mode=display">p(\tau)=p(s_1)\prod_{t=1}^T\pi_\theta(a_t|s_t)p(s_{t+1}|s_t,a_t)</script><p>&emsp;&emsp;其中 $p(s<em>1)$ 表示的是初始概率分布， $p(s</em>{t+1}|s<em>t,a_t)$ 表示和决策相关的状态转移概率， $\pi</em>\theta(a_t|s_t)$ 表示我们的决策函数， $\theta$ 是决策函数的参数。</p>
+<p>&emsp;&emsp;策略梯度方法的目标就是得到一组能够使期望累积reward最大的策略函数参数，形式化一下就是下面公式这个样子，多数的文献中会引入折扣因子 $\gamma$，我这里为了便于理解就先不加了。</p>
+<script type="math/tex; mode=display">
+Goal:\theta^\star=\arg\max_{\theta}E_{\tau-p_{\theta}(\tau)}[ \sum_t{r(s_t,a_t)} ]</script><p>&emsp;&emsp;由此我们可以写出一个优化的目标函数：</p>
+<script type="math/tex; mode=display">J(\theta)=E_{\tau-p_{\theta}(\tau)}[\sum_t{r(s_t,a_t)}]</script><h3 id="二、优化问题求解"><a href="#二、优化问题求解" class="headerlink" title="二、优化问题求解"></a>二、优化问题求解</h3><p>&emsp;&emsp;上一节中提到了我们的优化目标，也给出了优化问题的具体形式，那么我们怎样求解呢？看起来毫无头绪，那么让我们回过头来看一下这个优化问题，这里为了书写方便用$r(\tau)$代替$\sum_t{r(s_t,a_t)}$，同时根据期望的定义，优化问题可以进一步展开写成如下形式。</p>
+<script type="math/tex; mode=display">J(\theta)=E_{\tau-p_{\theta}(\tau)}[r(\tau)]={\displaystyle \int p_{\theta}(\tau) r(\tau) d\tau}</script><p>&emsp;&emsp;具体如何求解我们还是求助于老朋友梯度下降，我们希望对这个优化目标函数求梯度，我们动手来推导一下$J(\theta)$的梯度项，首先说明一下这里有一个trick，对于$\nabla<em>{\theta}p</em>{\theta}(\tau)$有这样一个等式成立$\nabla<em>{\theta}p</em>{\theta}(\tau)=p<em>{\theta}(\tau)\nabla</em>{\theta}\log{p_{\theta}(\tau)}$，根据log复合函数的求导法则可以很容易的得到这个等式。<br>&emsp;&emsp;对梯度项应用上面的trick，可以得到这样的结果。</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+\nabla_{\theta}J &= {\displaystyle \int \nabla_{\theta} p_{\theta}(\tau) r(\tau) d\tau}\\\\
+   &={\displaystyle \int  p_{\theta}(\tau) \nabla_{\theta} \log{p_{\theta}(\tau)} r(\tau) d\tau}\\\\
+   &=E_{\tau-p_{\theta}(\tau)}[\nabla_{\theta} \log{p_{\theta}(\tau)} r(\tau)]
+\end{aligned}</script><p>&emsp;&emsp;这个trick的目的是什么呢？<br>&emsp;&emsp;首先，这个期望的形式看起来是不是有一些熟悉，感觉和极大似然(Maximum Likelihood Estimate，MLE)有几分相似，直观理解一下，就像是在极大似然中引入了累积reward作为权重一样。同时对于这$\nabla<em>{\theta}\log{p</em>{\theta}(\tau)}$这一项其实还有文章可做，记得前面对$p_{\theta}(\tau)$的展开吗？累乘的形式在log函数下可以化为累加，因为我们我们想要针对$\theta$求梯度，从这个展开式中来看，初始状态分布和状态转移概率和$\theta$没有关系，所以在求导的时候这些项都被消去了。具体的过程如下：</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+\nabla_{\theta} \log{p_{\theta}(\tau)} &= \nabla_{\theta} \{\log{p(s_1)} +\sum_{t=1}^T[\log{\pi_{\theta}(a_y|s_t)} +\log{p(s_{t+1}|s_t,a_t)} ]\} \\\\
+ &= \nabla_{\theta} \sum_{t=1}^T \log{\pi_{\theta}(a_t|s_t)}\\\\
+\nabla_{\theta}J &= E_{\tau-p_{\theta}(\tau)}[ \sum_{t=1}^T \nabla_{\theta} \log{\pi_{\theta}(a_t|s_t)}  \sum_{t=1}^T{r(s_t,a_t)}]
+\end{aligned}</script><p>&emsp;&emsp;梯度项变成了一个期望，但问题还是怎么计算呢？这里使用了蒙特卡洛估计，也就是通过采样的方式去计算期望的估计：</p>
+<script type="math/tex; mode=display">\nabla_{\theta}J \approx \frac{1}{N} \sum_{i=1}^N 
+[ (\sum_{t=1}^T \nabla_{\theta} \log{\pi_{\theta}(a_{i,t}|s_{i,t})}) 
+(\sum_{t=1}^T r(s_{i,t},a_{i,t}) ) ]</script><p>&emsp;&emsp;将以上的步骤整合一下，我们就得到了一个经典的强化学习算法REINFORCE,有兴趣的同学可以去找这篇原文来读一读，很经典。</p>
 <blockquote>
-<p>REINFORCE(Williams,1992)<br>1.应用策略$\pi_{\theta}(a|s)$采样多条轨迹${\tau_i}$;<br>2.通过蒙特卡洛估计计算$\nabla_{\theta}J(\theta)$;<br>3.$\theta \leftarrow \theta + \alpha\nabla_{\theta}J(\theta)$</p>
-</blockquote>
+<p>REINFORCE(Williams,1992)<br>    1.应用策略$\pi<em>{\theta}(a|s)$采样多条轨迹${\tau_i}$;<br>    2.通过蒙特卡洛估计计算$\nabla</em>{\theta}J(\theta)$;<br>    3.$\theta \leftarrow \theta + \alpha\nabla_{\theta}J(\theta)$</p>
 <h3 id="三、REINFORCE中存在的一些问题"><a href="#三、REINFORCE中存在的一些问题" class="headerlink" title="三、REINFORCE中存在的一些问题"></a>三、REINFORCE中存在的一些问题</h3><p>&emsp;&emsp;REINFORCE算法看起来挺不错的，存在什么缺陷吗？其实在实际的应用中会发现一些问题，主要是是对梯度的估计方差太高了。造成这种情况的原因有二：<br><strong>1.蒙特卡洛估计</strong></p>
+</blockquote>
 <div align=center>
 
-<p><img src="/assets/img/blog2_policy_gradient/3.png" alt="蒙特卡洛估计"> </p>
+![蒙特卡洛估计](/assets/img/blog2_policy_gradient/3.png) 
+
 </div>
 
 <p>&emsp;&emsp;蒙特卡洛估计本身是无偏估计，但是当采样量不够大的时候就容易出现结果方差较大的问题，这个问题其实可以通过加大采样量来解决，但是由于计算资源的限制，我们不可能去无限制的采样。</p>
 <p><strong>2.累积reward的错误使用方式</strong></p>
 <div align=center>
 
-<p><img src="/assets/img/blog2_policy_gradient/4.png" alt="累积reward的错误使用方式"><br> </div></p>
-<p>&emsp;&emsp;对梯度估计的方差来源主要是后半部分，也就是累积reward那一部分，我们的轨迹越长，累加项越多，数值变大的同时方差也越大。举一个例子，上图中的两组数据表示对应轨迹的$\nabla_{\theta}\log{ p_{\theta}(\tau) }$和累积reward，看起来组内数据之间相差的都不多，但是对应相乘之后结果之间的方差会变大。</p>
+![累积reward的错误使用方式](/assets/img/blog2_policy_gradient/4.png)
+ </div>
+
+<p>&emsp;&emsp;对梯度估计的方差来源主要是后半部分，也就是累积reward那一部分，我们的轨迹越长，累加项越多，数值变大的同时方差也越大。举一个例子，上图中的两组数据表示对应轨迹的$\nabla<em>{\theta}\log{ p</em>{\theta}(\tau) }$和累积reward，看起来组内数据之间相差的都不多，但是对应相乘之后结果之间的方差会变大。</p>
 <h3 id="四、问题的解决方法"><a href="#四、问题的解决方法" class="headerlink" title="四、问题的解决方法"></a>四、问题的解决方法</h3><p>&emsp;&emsp;问题发现了，怎样解决呢？比较初步的解决方法有两种：首先，既然reward的累加项多会导致方法大，那就想办法减少累加项数；其次，reward累加项的数值过大可能也会导致方差大，那就在不影响最终效果的前提下换一种方式表示累加reward这个权重。<br><strong>1.因果关系(Causality)</strong><br>&emsp;&emsp;一个直观的想法是，当前时刻的决策只会影响当前时刻之后的累积reward，我今天买一张彩票不可能中昨天开奖的号码吧，这种思想有一些文献里称为“因果关系”。体现在梯度项的公式里是这样的：</p>
-<p>$$<br>\nabla_{\theta}J \approx \frac{1}{N} \sum_{i&#x3D;1}^N<br>[<br>    \sum_{t&#x3D;1}^T \nabla_{\theta} \log{\pi_{\theta}(a_{i,t}|s_{i,t})}<br>(\sum_{t’&#x3D;t}^T r(s_{i,t’},a_{i,t’}) )<br>]<br>$$</p>
-<p><strong>2.加入Baseline</strong><br>&emsp;&emsp;针对累加项数值过大的问题，一个顺理成章的想法是在每个累积项后面减去平均值，由绝对的大小关系变成相对的大小关系。</p>
-<p>$$<br>\begin{aligned}<br>\nabla_{\theta}J &amp;\approx \frac{1}{N} \sum_{i&#x3D;1}^N<br>[<br>    \sum_{t&#x3D;1}^T \nabla_{\theta} \log{\pi_{\theta}(a_{i,t}|s_{i,t})}<br>(\sum_{t&#x3D;1}^T r(s_{i,t},a_{i,t}) - b )<br>]\\<br>b &amp;&#x3D; \frac{1}{N} \sum_{i&#x3D;1}^N r(\tau_i)<br>\end{aligned}<br>$$</p>
-<p>&emsp;&emsp;进一步降低方差的方法可以延伸到Actor-Critic那里了，下次再说。</p>
+<script type="math/tex; mode=display">
+\nabla_{\theta}J \approx \frac{1}{N} \sum_{i=1}^N 
+[ 
+    \sum_{t=1}^T \nabla_{\theta} \log{\pi_{\theta}(a_{i,t}|s_{i,t})} 
+(\sum_{t'=t}^T r(s_{i,t'},a_{i,t'}) ) 
+]</script><p><strong>2.加入Baseline</strong><br>&emsp;&emsp;针对累加项数值过大的问题，一个顺理成章的想法是在每个累积项后面减去平均值，由绝对的大小关系变成相对的大小关系。</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+\nabla_{\theta}J &\approx \frac{1}{N} \sum_{i=1}^N 
+[ 
+    \sum_{t=1}^T \nabla_{\theta} \log{\pi_{\theta}(a_{i,t}|s_{i,t})} 
+(\sum_{t=1}^T r(s_{i,t},a_{i,t}) - b ) 
+]\\\\
+b &= \frac{1}{N} \sum_{i=1}^N r(\tau_i)
+\end{aligned}</script><p>&emsp;&emsp;进一步降低方差的方法可以延伸到Actor-Critic那里了，下次再说。</p>
 
       
 
@@ -347,11 +363,20 @@ if(!isFinite(o.call(this)))throw RangeError("Invalid time value");var t=this,n=t
 return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var e=r(54),i=r(2),o=e.get,u=e.key;e.exp({getOwnMetadata:function(t,n){return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){var e=r(54),i=r(2),o=r(32),u=e.has,c=e.key,f=function(t,n,r){if(u(t,n,r))return!0;var e=o(n);return null!==e&&f(t,e,r)};e.exp({hasMetadata:function(t,n){return f(t,i(n),arguments.length<3?void 0:c(arguments[2]))}})},function(t,n,r){var e=r(54),i=r(2),o=e.has,u=e.key;e.exp({hasOwnMetadata:function(t,n){return o(t,i(n),arguments.length<3?void 0:u(arguments[2]))}})},function(t,n,r){var e=r(54),i=r(2),o=r(26),u=e.key,c=e.set;e.exp({metadata:function(t,n){return function(r,e){c(t,n,(void 0!==e?i:o)(r),u(e))}}})},function(t,n,r){var e=r(1);e(e.P+e.R,"Set",{toJSON:r(165)("Set")})},function(t,n,r){"use strict";var e=r(1),i=r(147)(!0);e(e.P,"String",{at:function(t){return i(this,t)}})},function(t,n,r){"use strict";var e=r(1),i=r(46),o=r(16),u=r(122),c=r(120),f=RegExp.prototype,a=function(t,n){this._r=t,this._s=n};r(139)(a,"RegExp String",function(){var t=this._r.exec(this._s);return{value:t,done:null===t}}),e(e.P,"String",{matchAll:function(t){if(i(this),!u(t))throw TypeError(t+" is not a regexp!");var n=String(this),r="flags"in f?String(t.flags):c.call(t),e=new RegExp(t.source,~r.indexOf("g")?r:"g"+r);return e.lastIndex=o(t.lastIndex),new a(e,n)}})},function(t,n,r){"use strict";var e=r(1),i=r(181);e(e.P,"String",{padEnd:function(t){return i(this,t,arguments.length>1?arguments[1]:void 0,!1)}})},function(t,n,r){"use strict";var e=r(1),i=r(181);e(e.P,"String",{padStart:function(t){return i(this,t,arguments.length>1?arguments[1]:void 0,!0)}})},function(t,n,r){"use strict";r(82)("trimLeft",function(t){return function(){return t(this,1)}},"trimStart")},function(t,n,r){"use strict";r(82)("trimRight",function(t){return function(){return t(this,2)}},"trimEnd")},function(t,n,r){r(153)("asyncIterator")},function(t,n,r){r(153)("observable")},function(t,n,r){var e=r(1);e(e.S,"System",{global:r(3)})},function(t,n,r){for(var e=r(155),i=r(28),o=r(3),u=r(27),c=r(80),f=r(7),a=f("iterator"),s=f("toStringTag"),l=c.Array,h=["NodeList","DOMTokenList","MediaList","StyleSheetList","CSSRuleList"],v=0;v<5;v++){var p,d=h[v],y=o[d],g=y&&y.prototype;if(g){g[a]||u(g,a,l),g[s]||u(g,s,d),c[d]=l;for(p in e)g[p]||i(g,p,e[p],!0)}}},function(t,n,r){var e=r(1),i=r(151);e(e.G+e.B,{setImmediate:i.set,clearImmediate:i.clear})},function(t,n,r){var e=r(3),i=r(1),o=r(121),u=r(207),c=e.navigator,f=!!c&&/MSIE .\./.test(c.userAgent),a=function(t){return f?function(n,r){return t(o(u,[].slice.call(arguments,2),"function"==typeof n?n:Function(n)),r)}:t};i(i.G+i.B+i.F*f,{setTimeout:a(e.setTimeout),setInterval:a(e.setInterval)})},function(t,n,r){r(330),r(269),r(271),r(270),r(273),r(275),r(280),r(274),r(272),r(282),r(281),r(277),r(278),r(276),r(268),r(279),r(283),r(284),r(236),r(238),r(237),r(286),r(285),r(256),r(266),r(267),r(257),r(258),r(259),r(260),r(261),r(262),r(263),r(264),r(265),r(239),r(240),r(241),r(242),r(243),r(244),r(245),r(246),r(247),r(248),r(249),r(250),r(251),r(252),r(253),r(254),r(255),r(317),r(322),r(329),r(320),r(312),r(313),r(318),r(323),r(325),r(308),r(309),r(310),r(311),r(314),r(315),r(316),r(319),r(321),r(324),r(326),r(327),r(328),r(231),r(233),r(232),r(235),r(234),r(220),r(218),r(224),r(221),r(227),r(229),r(217),r(223),r(214),r(228),r(212),r(226),r(225),r(219),r(222),r(211),r(213),r(216),r(215),r(230),r(155),r(302),r(307),r(184),r(303),r(304),r(305),r(306),r(287),r(183),r(185),r(186),r(342),r(331),r(332),r(337),r(340),r(341),r(335),r(338),r(336),r(339),r(333),r(334),r(288),r(289),r(290),r(291),r(292),r(295),r(293),r(294),r(296),r(297),r(298),r(299),r(301),r(300),r(343),r(369),r(372),r(371),r(373),r(374),r(370),r(375),r(376),r(354),r(357),r(353),r(351),r(352),r(355),r(356),r(346),r(368),r(377),r(345),r(347),r(349),r(348),r(350),r(359),r(360),r(362),r(361),r(364),r(363),r(365),r(366),r(367),r(344),r(358),r(380),r(379),r(378),t.exports=r(52)},function(t,n){function r(t,n){if("string"==typeof n)return t.insertAdjacentHTML("afterend",n);var r=t.nextSibling;return r?t.parentNode.insertBefore(n,r):t.parentNode.appendChild(n)}t.exports=r},,,,,,,,,function(t,n,r){(function(n,r){!function(n){"use strict";function e(t,n,r,e){var i=n&&n.prototype instanceof o?n:o,u=Object.create(i.prototype),c=new p(e||[]);return u._invoke=s(t,r,c),u}function i(t,n,r){try{return{type:"normal",arg:t.call(n,r)}}catch(t){return{type:"throw",arg:t}}}function o(){}function u(){}function c(){}function f(t){["next","throw","return"].forEach(function(n){t[n]=function(t){return this._invoke(n,t)}})}function a(t){function n(r,e,o,u){var c=i(t[r],t,e);if("throw"!==c.type){var f=c.arg,a=f.value;return a&&"object"==typeof a&&m.call(a,"__await")?Promise.resolve(a.__await).then(function(t){n("next",t,o,u)},function(t){n("throw",t,o,u)}):Promise.resolve(a).then(function(t){f.value=t,o(f)},u)}u(c.arg)}function e(t,r){function e(){return new Promise(function(e,i){n(t,r,e,i)})}return o=o?o.then(e,e):e()}"object"==typeof r&&r.domain&&(n=r.domain.bind(n));var o;this._invoke=e}function s(t,n,r){var e=P;return function(o,u){if(e===F)throw new Error("Generator is already running");if(e===M){if("throw"===o)throw u;return y()}for(r.method=o,r.arg=u;;){var c=r.delegate;if(c){var f=l(c,r);if(f){if(f===A)continue;return f}}if("next"===r.method)r.sent=r._sent=r.arg;else if("throw"===r.method){if(e===P)throw e=M,r.arg;r.dispatchException(r.arg)}else"return"===r.method&&r.abrupt("return",r.arg);e=F;var a=i(t,n,r);if("normal"===a.type){if(e=r.done?M:j,a.arg===A)continue;return{value:a.arg,done:r.done}}"throw"===a.type&&(e=M,r.method="throw",r.arg=a.arg)}}}function l(t,n){var r=t.iterator[n.method];if(r===g){if(n.delegate=null,"throw"===n.method){if(t.iterator.return&&(n.method="return",n.arg=g,l(t,n),"throw"===n.method))return A;n.method="throw",n.arg=new TypeError("The iterator does not provide a 'throw' method")}return A}var e=i(r,t.iterator,n.arg);if("throw"===e.type)return n.method="throw",n.arg=e.arg,n.delegate=null,A;var o=e.arg;return o?o.done?(n[t.resultName]=o.value,n.next=t.nextLoc,"return"!==n.method&&(n.method="next",n.arg=g),n.delegate=null,A):o:(n.method="throw",n.arg=new TypeError("iterator result is not an object"),n.delegate=null,A)}function h(t){var n={tryLoc:t[0]};1 in t&&(n.catchLoc=t[1]),2 in t&&(n.finallyLoc=t[2],n.afterLoc=t[3]),this.tryEntries.push(n)}function v(t){var n=t.completion||{};n.type="normal",delete n.arg,t.completion=n}function p(t){this.tryEntries=[{tryLoc:"root"}],t.forEach(h,this),this.reset(!0)}function d(t){if(t){var n=t[w];if(n)return n.call(t);if("function"==typeof t.next)return t;if(!isNaN(t.length)){var r=-1,e=function n(){for(;++r<t.length;)if(m.call(t,r))return n.value=t[r],n.done=!1,n;return n.value=g,n.done=!0,n};return e.next=e}}return{next:y}}function y(){return{value:g,done:!0}}var g,b=Object.prototype,m=b.hasOwnProperty,x="function"==typeof Symbol?Symbol:{},w=x.iterator||"@@iterator",S=x.asyncIterator||"@@asyncIterator",_=x.toStringTag||"@@toStringTag",O="object"==typeof t,E=n.regeneratorRuntime;if(E)return void(O&&(t.exports=E));E=n.regeneratorRuntime=O?t.exports:{},E.wrap=e;var P="suspendedStart",j="suspendedYield",F="executing",M="completed",A={},N={};N[w]=function(){return this};var T=Object.getPrototypeOf,I=T&&T(T(d([])));I&&I!==b&&m.call(I,w)&&(N=I);var k=c.prototype=o.prototype=Object.create(N);u.prototype=k.constructor=c,c.constructor=u,c[_]=u.displayName="GeneratorFunction",E.isGeneratorFunction=function(t){var n="function"==typeof t&&t.constructor;return!!n&&(n===u||"GeneratorFunction"===(n.displayName||n.name))},E.mark=function(t){return Object.setPrototypeOf?Object.setPrototypeOf(t,c):(t.__proto__=c,_ in t||(t[_]="GeneratorFunction")),t.prototype=Object.create(k),t},E.awrap=function(t){return{__await:t}},f(a.prototype),a.prototype[S]=function(){return this},E.AsyncIterator=a,E.async=function(t,n,r,i){var o=new a(e(t,n,r,i));return E.isGeneratorFunction(n)?o:o.next().then(function(t){return t.done?t.value:o.next()})},f(k),k[_]="Generator",k.toString=function(){return"[object Generator]"},E.keys=function(t){var n=[];for(var r in t)n.push(r);return n.reverse(),function r(){for(;n.length;){var e=n.pop();if(e in t)return r.value=e,r.done=!1,r}return r.done=!0,r}},E.values=d,p.prototype={constructor:p,reset:function(t){if(this.prev=0,this.next=0,this.sent=this._sent=g,this.done=!1,this.delegate=null,this.method="next",this.arg=g,this.tryEntries.forEach(v),!t)for(var n in this)"t"===n.charAt(0)&&m.call(this,n)&&!isNaN(+n.slice(1))&&(this[n]=g)},stop:function(){this.done=!0;var t=this.tryEntries[0],n=t.completion;if("throw"===n.type)throw n.arg;return this.rval},dispatchException:function(t){function n(n,e){return o.type="throw",o.arg=t,r.next=n,e&&(r.method="next",r.arg=g),!!e}if(this.done)throw t;for(var r=this,e=this.tryEntries.length-1;e>=0;--e){var i=this.tryEntries[e],o=i.completion;if("root"===i.tryLoc)return n("end");if(i.tryLoc<=this.prev){var u=m.call(i,"catchLoc"),c=m.call(i,"finallyLoc");if(u&&c){if(this.prev<i.catchLoc)return n(i.catchLoc,!0);if(this.prev<i.finallyLoc)return n(i.finallyLoc)}else if(u){if(this.prev<i.catchLoc)return n(i.catchLoc,!0)}else{if(!c)throw new Error("try statement without catch or finally");if(this.prev<i.finallyLoc)return n(i.finallyLoc)}}}},abrupt:function(t,n){for(var r=this.tryEntries.length-1;r>=0;--r){var e=this.tryEntries[r];if(e.tryLoc<=this.prev&&m.call(e,"finallyLoc")&&this.prev<e.finallyLoc){var i=e;break}}i&&("break"===t||"continue"===t)&&i.tryLoc<=n&&n<=i.finallyLoc&&(i=null);var o=i?i.completion:{};return o.type=t,o.arg=n,i?(this.method="next",this.next=i.finallyLoc,A):this.complete(o)},complete:function(t,n){if("throw"===t.type)throw t.arg;return"break"===t.type||"continue"===t.type?this.next=t.arg:"return"===t.type?(this.rval=this.arg=t.arg,this.method="return",this.next="end"):"normal"===t.type&&n&&(this.next=n),A},finish:function(t){for(var n=this.tryEntries.length-1;n>=0;--n){var r=this.tryEntries[n];if(r.finallyLoc===t)return this.complete(r.completion,r.afterLoc),v(r),A}},catch:function(t){for(var n=this.tryEntries.length-1;n>=0;--n){var r=this.tryEntries[n];if(r.tryLoc===t){var e=r.completion;if("throw"===e.type){var i=e.arg;v(r)}return i}}throw new Error("illegal catch attempt")},delegateYield:function(t,n,r){return this.delegate={iterator:d(t),resultName:n,nextLoc:r},"next"===this.method&&(this.arg=g),A}}}("object"==typeof n?n:"object"==typeof window?window:"object"==typeof self?self:this)}).call(n,function(){return this}(),r(158))}])</script><script src="/./main.0cf68a.js"></script><script>!function(){!function(e){var t=document.createElement("script");document.getElementsByTagName("body")[0].appendChild(t),t.setAttribute("src",e)}("/slider.e37972.js")}()</script>
 
 
+<script type="text/javascript" async
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script> -->
+
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
     tex2jax: {
         inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        displayMath: [['$$','$$'], ['\[','\]']],
         processEscapes: true,
+        processEnvironments: true,
         skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
     }
 });
@@ -362,9 +387,6 @@ MathJax.Hub.Queue(function() {
         all[i].SourceElement().parentNode.className += ' has-jax';                 
     }       
 });
-</script>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
 </script>
 
 
@@ -441,6 +463,10 @@ MathJax.Hub.Queue(function() {
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">强化学习</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">transormfer</a>
               </li>
              
               <li class="article-tag-list-item">
